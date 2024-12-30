@@ -14,8 +14,8 @@ COPY . .
 # Installing dependencies
 RUN npm install
 
-# Starting our application
-CMD [ "npm", "run", "dev" ]
-
 # Exposing server port
 EXPOSE 8080
+
+# Starting our application
+CMD [ "npm", "run", "dev" ]
