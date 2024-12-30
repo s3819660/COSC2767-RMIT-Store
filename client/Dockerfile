@@ -3,7 +3,7 @@ FROM node:20 AS builder
 ENV NODE_ENV development
 WORKDIR /app
 COPY package*.json ./
-RUN npm install --verbose
+RUN npm install
 COPY . .
 
 
