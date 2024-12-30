@@ -7,12 +7,14 @@ ENV NODE_ENV development
 # Setting up the work directory
 WORKDIR /app
 
-# Copying all the files in our project
+# Copy only package.json and package-lock.json to leverage Docker's cache
 COPY package*.json ./
-COPY . .
 
 # Installing dependencies
 RUN npm install
+
+# Copying all the files in our project
+COPY . .
 
 # Exposing server port
 EXPOSE 8080
