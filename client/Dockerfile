@@ -8,6 +8,7 @@ ENV NODE_ENV development
 WORKDIR /app
 
 # Copying all the files in our project
+COPY package*.json ./
 COPY . .
 
 # Installing dependencies
