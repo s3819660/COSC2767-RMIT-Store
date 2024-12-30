@@ -1,5 +1,5 @@
 # Fetching the minified node image on apline linux
-FROM node:20 as builder
+FROM node:20 AS builder
 ENV NODE_ENV development
 WORKDIR /app
 COPY package*.json ./
@@ -11,6 +11,6 @@ COPY . .
 FROM node:20-slim
 ENV NODE_ENV development
 WORKDIR /app
-COPY --from:builder /app .
+COPY --from=builder /app .
 EXPOSE 8080
 CMD [ "npm", "run", "dev" ]
