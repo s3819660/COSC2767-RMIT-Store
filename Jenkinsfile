@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    // app build using java maven -> need install these tools (on Jenkins UI)
-    // then also add here as tools need to use
-    tools {
-        // jdk "JDK 17"
-    }
 
     // identify environment variables
     environment {
