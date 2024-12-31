@@ -5,6 +5,7 @@ pipeline {
     // then also add here as tools need to use
     tools {
         nodejs "nodejs"
+        jdk "jdk"
     }
 
     // identify environment variables
