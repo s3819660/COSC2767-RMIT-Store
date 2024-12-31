@@ -29,8 +29,7 @@ pipeline {
             }
         }
 
-        stage("Build App"){ // usually is Git
-            // credentialId - what we named ID when adding credential
+        stage("Build App"){ 
             steps { 
                 sh "cd client"
                 sh "npm install"
