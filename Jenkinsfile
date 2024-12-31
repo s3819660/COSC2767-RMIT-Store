@@ -6,6 +6,7 @@ pipeline {
     tools {
         nodejs "nodejs"
         jdk "jdk"
+        docker "docker"
     }
 
     // identify environment variables
