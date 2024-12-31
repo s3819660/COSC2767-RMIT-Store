@@ -33,9 +33,9 @@ pipeline {
             steps { 
                 sh "pwd"
                 sh "ls -la"
-                sh "cd ./client"
+                sh "cd ./client/"
                 sh "ls -la"
-                sh "npm install"
+                // sh "npm install"
             }
         }
 
