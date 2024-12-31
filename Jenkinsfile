@@ -31,11 +31,13 @@ pipeline {
 
         stage("Build App"){ 
             steps { 
-                sh "pwd"
-                sh "ls -la"
-                sh "cd client"
-                sh "ls -la"
-                // sh "npm install"
+                sh '''
+                    pwd
+                    ls -la
+                    cd client
+                    ls -la
+                    npm install
+                '''
             }
         }
 
