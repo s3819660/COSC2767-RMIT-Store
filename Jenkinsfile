@@ -38,27 +38,27 @@ pipeline {
         }
 
         // create Docker image -> push to Docker Hub -> pull back to build image
-        stage("Build & Push Docker image"){
-            steps {
-                script {
-                    // "docker" the global object seen as Docker plugin
-                    // empty registry - use default Docker Hub
+        // stage("Build & Push Docker image"){
+        //     steps {
+        //         script {
+        //             // "docker" the global object seen as Docker plugin
+        //             // empty registry - use default Docker Hub
 
 
-                    // docker.withRegistry('', DOCKER_CREDENTIALS) {      // authenticates with a Docker registry
-                    //     docker_image = docker.build("${IMAGE_NAME}", "./client")
-                    // }
+        //             docker.withRegistry('', DOCKER_CREDENTIALS) {      // authenticates with a Docker registry
+        //                 docker_image = docker.build("${IMAGE_NAME}", "./client")
+        //             }
 
-                    // // ------------- can be in a separate registry auth if different registry ------------------------
-                    // docker.withRegistry('', DOCKER_CREDENTIALS) {
-                    // // .push() push image with a specific tag
-                    //     docker_image.push("${IMAGE_TAG}")
+        //             // ------------- can be in a separate registry auth if different registry ------------------------
+        //             docker.withRegistry('', DOCKER_CREDENTIALS) {
+        //             // .push() push image with a specific tag
+        //                 docker_image.push("${IMAGE_TAG}")
 
-                    //     // latest - a convention in Docker that points to the most recent version of the image
-                    //     docker_image.push("latest")     // helpful for finding d most up-to-date image without specifying a version
-                    // }
-                }
-            }
-        }
+        //                 // latest - a convention in Docker that points to the most recent version of the image
+        //                 docker_image.push("latest")     // helpful for finding d most up-to-date image without specifying a version
+        //             }
+        //         }
+        //     }
+        // }
     }
 }
