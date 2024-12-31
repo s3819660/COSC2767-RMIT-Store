@@ -1,4 +1,5 @@
 pipeline {
+    // run this command to fix jenkins user does not have permissions to /var/lib/jenkins/ chown -R jenkins /var/lib/jenkins/workspace
     agent any
 
     // app build using java maven -> need install these tools (on Jenkins UI)
@@ -21,6 +22,12 @@ pipeline {
     }
 
     stages {
+        stage("Clean Workspace") {
+            steps {
+                cleanWs()
+            }
+        }
+        
         // checkout code from source code
         stage("Checkout from SCM"){ // usually is Git
             // credentialId - what we named ID when adding credential
@@ -28,18 +35,42 @@ pipeline {
                 git branch: "main", url: "https://github.com/s3819660/COSC2767-RMIT-Store.git"
             }
         }
+        
+        /*
+        stage('Copy Project') {
+            steps {
+                dir('/var/lib/jenkins/workspace') {
+                    sh 'rsync -av --progress TestRmitStore ~/ --exclude .git'
+                }
+            }
+        }
+        */
+        
+        
+        stage('Install npm Dependencies') {
+            steps {
+                dir('/var/lib/jenkins/workspace/TestRmitStore/client') {
+                    sh 'npm install'
+                }
+            }
+        }
+        
+        /*
+        stage('Build Docker Image') {
+            steps {
+                dir('/var/lib/jenkins/workspace/TestRmitStore/client') {
+                    sh 'docker build -t fe-rmit-store .'
+                }
+            }
+        }
+        */
 
         // create Docker image -> push to Docker Hub -> pull back to build image
         stage("Build & Push Docker image"){
             steps {
                 script {
-                    // "docker" the global object seen as Docker plugin
-                    // empty registry - use default Docker Hub
 
-
-                    docker.withRegistry('', DOCKER_CREDENTIALS) {      // authenticates with a Docker registry
-                        docker_image = docker.build("${IMAGE_NAME}", "./client")
-                    }
+                    docker_image = docker.build("${IMAGE_NAME}", "/var/lib/jenkins/workspace/TestRmitStore/client")
 
                     // ------------- can be in a separate registry auth if different registry ------------------------
                     docker.withRegistry('', DOCKER_CREDENTIALS) {
