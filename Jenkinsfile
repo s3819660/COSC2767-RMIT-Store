@@ -29,8 +29,9 @@ pipeline {
 
         stage("Build App"){ 
             steps { 
-                sh "cd client"
-                sh "npm install"
+                sh "pwd"
+                // sh "cd client"
+                // sh "npm install"
             }
         }
 
