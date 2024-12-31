@@ -1,6 +1,9 @@
 pipeline {
     agent any
 
+    tools {
+        nodejs "nodejs"
+    }
 
     // identify environment variables
     environment {
