@@ -33,8 +33,8 @@ pipeline {
             steps { 
                 sh "pwd"
                 sh "ls -la"
-                // sh "cd client"
-                // sh "npm install"
+                sh "cd ./client"
+                sh "npm install"
             }
         }
 
