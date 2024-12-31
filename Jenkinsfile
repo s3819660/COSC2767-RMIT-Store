@@ -48,7 +48,7 @@ pipeline {
                     // "docker" the global object seen as Docker plugin
                     // empty registry - use default Docker Hub
 
-
+                    sh "pwd"
                     docker.withRegistry('', DOCKER_CREDENTIALS) {      // authenticates with a Docker registry
                         docker_image = docker.build("${IMAGE_NAME}", "./client")
                     }
