@@ -10,6 +10,6 @@
 FROM node:20-slim
 ENV NODE_ENV development
 WORKDIR /app
-COPY ./client /app/
+COPY . /app/client/
 EXPOSE 8080
 CMD [ "npm", "run", "dev" ]
