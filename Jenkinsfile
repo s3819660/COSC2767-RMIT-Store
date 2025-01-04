@@ -11,17 +11,24 @@ pipeline {
     // identify environment variables
     environment {
         // identify an app (that going to build) name
-        APP_NAME = "fe-rmit-store"
+        APP_NAME = "client"
         RELEASE = "1.0.0"
         DOCKER_USER = "nhan2102"
         DOCKER_CREDENTIALS = "dockerhub"
 
         IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"       // !!!!! should be this form either can not push !!!!!
-        
         IMAGE_TAG = "${RELEASE}-${env.BUILD_NUMBER}"      // will be updated in another pipeline
+
+        SERVICE_NAME = "${APP_NAME}-service"
     }
 
     stages {
+        stage("clean workspace"){
+            steps {
+                cleanWs()
+            }
+        }
+
         // checkout code from source code
         stage("Checkout from SCM"){ // usually is Git
             // credentialId - what we named ID when adding credential
@@ -54,20 +61,27 @@ pipeline {
 
                         // ------------- can be in a separate registry auth if different registry ------------------------
                         docker.withRegistry('', DOCKER_CREDENTIALS) {
-                        // .push() push image with a specific tag
                             docker_image.push("${IMAGE_TAG}")
 
-                            // latest - a convention in Docker that points to the most recent version of the image
                             docker_image.push("latest")     // helpful for finding d most up-to-date image without specifying a version
                         }
 
                     }
-                    // "docker" the global object seen as Docker plugin
-                    // empty registry - use default Docker Hub
 
-                    
                 }
             }
         }
+
+        stage('Deploy to Swarm') {
+            steps {
+                script {
+                    sh """
+                    docker service create --name ${SERVICE_NAME} --replicas 1 --publish 8080:3001 \
+                        ${IMAGE_NAME}:latest || docker service update --image ${IMAGE_NAME}:latest ${SERVICE_NAME}
+                    """
+                }
+            }
+        }
+
     }
 }
