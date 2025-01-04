@@ -1,5 +1,5 @@
 # Fetching the minified node image on apline linux
-FROM node:slim
+FROM node:20-slim
 
 # Declaring env
 ENV NODE_ENV development
@@ -7,11 +7,11 @@ ENV NODE_ENV development
 # Setting up the work directory
 WORKDIR /app
 
-# Copying all the files in our project
-COPY . .
+COPY package*.json ./
 
-# Installing dependencies
 RUN npm install
+
+COPY . .
 
 # Exposing server port
 EXPOSE 3000

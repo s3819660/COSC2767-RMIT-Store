@@ -11,7 +11,7 @@ pipeline {
     // identify environment variables
     environment {
         // identify an app (that going to build) name
-        APP_NAME = "client"
+        APP_NAME = "rmit-store"
         RELEASE = "1.0.0"
         DOCKER_USER = "nhan2102"
         DOCKER_CREDENTIALS = "dockerhub"
@@ -20,6 +20,7 @@ pipeline {
         IMAGE_TAG = "${RELEASE}-${env.BUILD_NUMBER}"      // will be updated in another pipeline
 
         SERVICE_NAME = "${APP_NAME}-service"
+        DP_STACK_NAME = "deploy-stack"
     }
 
     stages {
@@ -37,46 +38,53 @@ pipeline {
             }
         }
 
-        stage("Build App"){ 
-            steps { 
-                sh '''
-                    pwd
-                    ls -la
-                    cd client
-                    ls -la
-                    npm install
-                '''
-            }
-        }
+        // stage("Build App"){ 
+        //     steps { 
+        //         sh '''
+        //             pwd
+        //             ls -la
+        //             cd client
+        //             ls -la
+        //             npm install
+        //         '''
+        //     }
+        // }
 
         // create Docker image -> push to Docker Hub -> pull back to build image
-        stage("Build & Push Docker image"){
+        stage("Build & Push Docker images") {
             steps {
                 script {
-                    dir('client'){
-                        sh "pwd"
-                        docker.withRegistry('', DOCKER_CREDENTIALS) {      // authenticates with a Docker registry
-                            docker_image = docker.build("${IMAGE_NAME}")
+                    parallel(
+                        "Client": {
+                            dir('client') {
+                                docker.withRegistry('', DOCKER_CREDENTIALS) {
+                                def clientImage = docker.build("${IMAGE_NAME}-client")
+                                clientImage.push("${IMAGE_TAG}")
+                                clientImage.push("latest")
+                                }
+                            }
+                        },
+                        "Server": {
+                            dir('server') {
+                                docker.withRegistry('', DOCKER_CREDENTIALS) {
+                                def serverImage = docker.build("${IMAGE_NAME}-server")
+                                serverImage.push("${IMAGE_TAG}")
+                                serverImage.push("latest")
+                                }
+                            }
                         }
-
-                        // ------------- can be in a separate registry auth if different registry ------------------------
-                        docker.withRegistry('', DOCKER_CREDENTIALS) {
-                            docker_image.push("${IMAGE_TAG}")
-
-                            docker_image.push("latest")     // helpful for finding d most up-to-date image without specifying a version
-                        }
-
-                    }
-
+                    )
                 }
             }
         }
+
 
         stage("Pull Docker Image") { // New stage added to pull the latest image
             steps {
                 script {
                     sh """
-                    docker pull ${IMAGE_NAME}:latest
+                        docker pull ${IMAGE_NAME}-client:latest
+                        docker pull ${IMAGE_NAME}-server:latest
                     """
                 }
             }
@@ -85,13 +93,7 @@ pipeline {
         stage("Deploy to Swarm") {
             steps {
                 script {
-                    sh """
-                    if docker service ls --filter name=${SERVICE_NAME} --format '{{.Name}}' | grep -q ${SERVICE_NAME}; then
-                        docker service update --image ${IMAGE_NAME}:latest ${SERVICE_NAME}
-                    else
-                        docker service create --name ${SERVICE_NAME} --replicas 1 --publish 8081:9090 ${IMAGE_NAME}:latest
-                    fi
-                    """
+                    sh "docker stack deploy -c docker-compose.yml ${DP_STACK_NAME}"
                 }
             }
         }

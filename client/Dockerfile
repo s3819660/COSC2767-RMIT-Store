@@ -24,19 +24,3 @@ COPY . .
 EXPOSE 9090
 CMD ["npm", "run", "dev"]
 
-
-# ==== solution 3 ====
-# FROM node:20 AS builder
-# ENV NODE_ENV development
-# WORKDIR /app
-# COPY package*.json ./
-# RUN npm install
-# COPY . .
-
-
-# FROM node:20-slim
-# ENV NODE_ENV development
-# WORKDIR /app
-# COPY --from=builder /app .
-# EXPOSE 8080
-# CMD [ "npm", "run", "dev" ]
