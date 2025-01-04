@@ -11,5 +11,5 @@ FROM node:20-slim
 ENV NODE_ENV development
 WORKDIR /app
 COPY . .
-EXPOSE 8080
+EXPOSE 9090
 CMD [ "npm", "run", "dev" ]
