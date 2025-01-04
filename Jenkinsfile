@@ -72,15 +72,24 @@ pipeline {
             }
         }
 
-        stage('Deploy to Swarm') {
+        stage("Pull Docker Image") { // New stage added to pull the latest image
             steps {
                 script {
                     sh """
                     docker pull ${IMAGE_NAME}:latest
+                    """
+                }
+            }
+        }
+
+        stage("Deploy to Swarm") {
+            steps {
+                script {
+                    sh """
                     if docker service ls --filter name=${SERVICE_NAME} --format '{{.Name}}' | grep -q ${SERVICE_NAME}; then
                         docker service update --image ${IMAGE_NAME}:latest ${SERVICE_NAME}
                     else
-                        docker service create --name ${SERVICE_NAME} --replicas 1 --publish 8080:9090 ${IMAGE_NAME}:latest
+                        docker service create --name ${SERVICE_NAME} --replicas 1 --publish 8081:9090 ${IMAGE_NAME}:latest
                     fi
                     """
                 }
