@@ -76,8 +76,12 @@ pipeline {
             steps {
                 script {
                     sh """
-                    docker service create --name ${SERVICE_NAME} --replicas 1 --publish 9090:3001 \
-                        ${IMAGE_NAME}:latest || docker service update --image ${IMAGE_NAME}:latest ${SERVICE_NAME}
+                    docker pull ${IMAGE_NAME}:latest
+                    if docker service ls --filter name=${SERVICE_NAME} --format '{{.Name}}' | grep -q ${SERVICE_NAME}; then
+                        docker service update --image ${IMAGE_NAME}:latest ${SERVICE_NAME}
+                    else
+                        docker service create --name ${SERVICE_NAME} --replicas 1 --publish 9090:3001 ${IMAGE_NAME}:latest
+                    fi
                     """
                 }
             }
