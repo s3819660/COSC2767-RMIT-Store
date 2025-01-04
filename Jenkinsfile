@@ -20,7 +20,7 @@ pipeline {
         IMAGE_TAG = "${RELEASE}-${env.BUILD_NUMBER}"      // will be updated in another pipeline
 
         SERVICE_NAME = "${APP_NAME}-service"
-        DP_STACK_NAME = "deploy-stack"
+        DP_STACK_NAME = "deploy"
     }
 
     stages {
@@ -31,24 +31,11 @@ pipeline {
         }
 
         // checkout code from source code
-        stage("Checkout from SCM"){ // usually is Git
-            // credentialId - what we named ID when adding credential
+        stage("Checkout from SCM"){ 
             steps {
                 git branch: "main", url: "https://github.com/NhanNguyen20/COSC2767-RMIT-Store.git"
             }
         }
-
-        // stage("Build App"){ 
-        //     steps { 
-        //         sh '''
-        //             pwd
-        //             ls -la
-        //             cd client
-        //             ls -la
-        //             npm install
-        //         '''
-        //     }
-        // }
 
         // create Docker image -> push to Docker Hub -> pull back to build image
         stage("Build & Push Docker images") {

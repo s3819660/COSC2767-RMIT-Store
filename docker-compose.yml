@@ -1,5 +1,5 @@
 services:
-  client-service:
+  client:
     image: ${IMAGE_NAME}-client:latest
     ports:
       - "8080:9090"
@@ -7,7 +7,7 @@ services:
       replicas: 1
 
 
-  server-service:
+  server:
     image: ${IMAGE_NAME}-server:latest
     ports:
       - "3000:3000"

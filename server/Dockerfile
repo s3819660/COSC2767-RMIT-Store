@@ -2,7 +2,7 @@
 FROM node:20-slim
 
 # Declaring env
-ENV NODE_ENV development
+# ENV NODE_ENV development
 
 # Setting up the work directory
 WORKDIR /app
