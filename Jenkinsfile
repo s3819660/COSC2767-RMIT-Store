@@ -4,9 +4,8 @@ pipeline {
     // app build using java maven -> need install these tools (on Jenkins UI)
     // then also add here as tools need to use
     tools {
-        nodejs "nodejs"
-        jdk "jdk"
-        docker "docker"
+        nodejs "NodeJS"
+        jdk "JDK"
     }
 
     // identify environment variables
@@ -48,7 +47,6 @@ pipeline {
             steps {
                 script {
                     dir('client'){
-
                         sh "pwd"
                         docker.withRegistry('', DOCKER_CREDENTIALS) {      // authenticates with a Docker registry
                             docker_image = docker.build("${IMAGE_NAME}")
