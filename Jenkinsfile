@@ -76,7 +76,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                    docker service create --name ${SERVICE_NAME} --replicas 1 --publish 8080:3001 \
+                    docker service create --name ${SERVICE_NAME} --replicas 1 --publish 9090:3001 \
                         ${IMAGE_NAME}:latest || docker service update --image ${IMAGE_NAME}:latest ${SERVICE_NAME}
                     """
                 }
