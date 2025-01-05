@@ -117,7 +117,7 @@ pipeline {
                             aws cloudformation deploy \
                                 --template-file dev-env.yml \
                                 --stack-name MyDevEnv \
-                                --capabilities CAPABILITY_IAM
+                                --capabilities CAPABILITY_IAM \
                                 --parameter-overrides \
                                     KeyName=devops_project_key \
                                     VpcId=vpc-039718b6ccffe8eec \
