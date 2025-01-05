@@ -24,18 +24,21 @@ pipeline {
     }
 
     stages {
-        stage("clean workspace"){
+        stage("Clean Workspace") {
             steps {
-                script {
-                    cleanWs()
-                    sh """
-                        docker system prune -f
+                cleanWs()
+                sh '''
+                    docker system prune -f
+                    if [ $(docker ps -aq | wc -l) -gt 0 ]; then
                         docker rm -vf $(docker ps -aq)
+                    fi
+                    if [ $(docker images -aq | wc -l) -gt 0 ]; then
                         docker rmi -f $(docker images -aq)
-                    """
-                }
+                    fi
+                '''
             }
         }
+
 
         // checkout code from source code
         stage("Checkout from SCM"){ 
