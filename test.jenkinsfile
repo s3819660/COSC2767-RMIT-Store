@@ -113,15 +113,15 @@ pipeline {
             steps {
                 dir('cloudformation') {
                     script {
-                        sh '''
-                            aws cloudformation delete-stack --stack-name MyDevEnv
-                        '''
+                        // sh '''
+                        //     aws cloudformation delete-stack --stack-name MyDevEnv
+                        // '''
 
-                        // Wait for the stack to be deleted
-                        sh '''
-                            aws cloudformation wait stack-delete-complete \
-                                --stack-name MyDevEnv
-                        '''
+                        // // Wait for the stack to be deleted
+                        // sh '''
+                        //     aws cloudformation wait stack-delete-complete \
+                        //         --stack-name MyDevEnv
+                        // '''
 
                         sh '''
                             aws cloudformation deploy \
