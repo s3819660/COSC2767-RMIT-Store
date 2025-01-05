@@ -27,7 +27,7 @@ pipeline {
         stage("clean workspace"){
             steps {
                 script {
-                    cleanWs();
+                    cleanWs()
                     sh """
                         docker system prune -f
                         docker rm -vf $(docker ps -aq)
