@@ -90,25 +90,49 @@ pipeline {
             }
         }
 
-        stage("Pull Docker Image") { // New stage added to pull the latest image
+        // stage("Pull Docker Image") { // New stage added to pull the latest image
+        //     steps {
+        //         script {
+        //             sh """
+        //                 docker pull ${IMAGE_NAME}-client:latest
+        //                 docker pull ${IMAGE_NAME}-server:latest
+        //             """
+        //         }
+        //     }
+        // }
+
+        // stage("Deploy to Swarm") {
+        //     steps {
+        //         script {
+        //             sh "docker stack deploy -c docker-compose.yml ${DP_STACK_NAME}"
+        //         }
+        //     }
+        // }
+
+        stage('CloudFormation Deploy') {
             steps {
-                script {
-                    sh """
-                        docker pull ${IMAGE_NAME}-client:latest
-                        docker pull ${IMAGE_NAME}-server:latest
-                    """
+                dir('cloudformation') {
+                    script {
+                        sh '''
+                            aws cloudformation deploy \
+                                --template-file dev-env.yml \
+                                --stack-name MyDevEnv \
+                                --capabilities CAPABILITY_IAM
+                        '''
+                    }
                 }
             }
         }
-
-        stage("Deploy to Swarm") {
-            steps {
-                script {
-                    sh "docker stack deploy -c docker-compose.yml ${DP_STACK_NAME}"
-                }
-            }
-        }
-
+        
+        // stage("Ansible") {
+        //     steps {
+        //         script {
+        //             sh '''
+        //                 ansible-playbook playbook.yml
+        //             '''
+        //         }
+        //     }
+        // }
     }
 
     post {
