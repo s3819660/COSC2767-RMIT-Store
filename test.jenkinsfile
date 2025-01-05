@@ -172,9 +172,9 @@ pipeline {
                     sh """
                         if [ ! -f /home/ansibleadmin/.ssh/known_hosts ]; then
                             sudo mkdir -p /home/ansibleadmin/.ssh
-                            ssh-keyscan ${env.EC2_PUBLIC_IP} > /home/ansibleadmin/.ssh/known_hosts
+                            sudo ssh-keyscan ${env.EC2_PUBLIC_IP} > /home/ansibleadmin/.ssh/known_hosts
                         else
-                            ssh-keyscan ${env.EC2_PUBLIC_IP} >> /home/ansibleadmin/.ssh/known_hosts
+                            sudo ssh-keyscan ${env.EC2_PUBLIC_IP} >> /home/ansibleadmin/.ssh/known_hosts
                         fi
                     """
 
