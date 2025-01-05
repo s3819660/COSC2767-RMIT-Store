@@ -37,6 +37,29 @@ pipeline {
             }
         }
 
+        stage("Unit Test") {
+            steps {
+                parallel(
+                    "Client": {
+                        dir('client') {
+                            sh """
+                                npm install
+                                npm test
+                            """
+                        }   
+                    },
+                    "Server": {
+                        dir('server') {
+                            sh """
+                                npm install
+                                npm test
+                            """
+                        }
+                    }
+                )
+            }
+        } 
+
         // create Docker image -> push to Docker Hub -> pull back to build image
         stage("Build & Push Docker images") {
             steps {
