@@ -110,4 +110,11 @@ pipeline {
         }
 
     }
+
+    post {
+        failure {
+            echo "Build failed"
+            emailext body: "Build failed", subject: "Build failed", to: 'nhannguyen.learn@gmail.com'
+        }
+    }
 }
