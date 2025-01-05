@@ -1,20 +1,16 @@
 # Fetching the minified node image on apline linux
-FROM node:slim
-
-# Declaring env
+FROM node:20 AS builder
 ENV NODE_ENV development
-
-# Setting up the work directory
 WORKDIR /app
-
-# Copying all the files in our project
+COPY package*.json ./
+RUN npm install
 COPY . .
 
-# Installing dependencies
-RUN npm install
 
-# Exposing server port
+
+FROM node:20-slim
+ENV NODE_ENV development
+WORKDIR /app
+COPY --from=builder /app .
 EXPOSE 3000
-
-# Starting our application
 CMD [ "npm", "run", "dev" ]
