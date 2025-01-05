@@ -130,12 +130,10 @@ pipeline {
 
         stage('Ansible Test') {
             steps {
-                dir('/etc/ansible') {
-                    script {
-                        sh '''
-                            echo '[dev-server]' > ./hosts
-                        '''
-                    }
+                script {
+                    sh '''
+                        sudo echo '[dev-server]' > /etc/ansible/hosts
+                    '''
                 }
             }
         }
