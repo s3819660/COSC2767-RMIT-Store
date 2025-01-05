@@ -121,7 +121,7 @@ pipeline {
                                 --parameter-overrides \
                                     KeyName=devops_project_key \
                                     VpcId=vpc-039718b6ccffe8eec \
-                                    SubnetId=subnet-03d995dcd4d22e5b9 \
+                                    SubnetId=subnet-03d995dcd4d22e5b9
                         '''
                     }
                 }
