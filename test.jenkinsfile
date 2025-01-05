@@ -170,11 +170,11 @@ pipeline {
 
                     // Add the EC2 instance to the known hosts file
                     sh """
-                        if [ ! -f /var/lib/jenkins/.ssh/known_hosts ]; then
-                            mkdir -p /var/lib/jenkins/.ssh
-                            ssh-keyscan ${env.EC2_PUBLIC_IP} > /var/lib/jenkins/.ssh/known_hosts
+                        if [ ! -f /home/ansibleadmin/.ssh/known_hosts ]; then
+                            mkdir -p /var/lib/./.ssh
+                            ssh-keyscan ${env.EC2_PUBLIC_IP} > /home/ansibleadmin/.ssh/known_hosts
                         else
-                            ssh-keyscan ${env.EC2_PUBLIC_IP} >> /var/lib/jenkins/.ssh/known_hosts
+                            ssh-keyscan ${env.EC2_PUBLIC_IP} >> /home/ansibleadmin/.ssh/known_hosts
                         fi
                     """
 
