@@ -80,7 +80,7 @@ Resources:
 
 Outputs:
   EC2InstanceId:
-    Description: "The instance ID of the Dev EC2"
+    Description: "The instance ID of the Dev EC2 1"
     Value: !Ref DevEC2Instance
 
   EC2PublicIP:

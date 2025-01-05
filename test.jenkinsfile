@@ -123,6 +123,19 @@ pipeline {
                                     VpcId=vpc-039718b6ccffe8eec \
                                     SubnetId=subnet-03d995dcd4d22e5b9
                         '''
+
+                        // Wait for the stack to be created
+                        sh '''
+                            aws cloudformation wait stack-create-complete \
+                                --stack-name MyDevEnv
+                        '''
+
+                        // Retrieve the stack outputs
+                        def stackOutputs = sh(script: '''
+                            aws cloudformation describe-stacks \
+                                --stack-name MyDevEnv \
+                                --query "Stacks[0].Outputs"
+                        ''', returnStdout: true).trim()
                     }
                 }
             }
