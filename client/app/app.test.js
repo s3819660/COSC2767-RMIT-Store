@@ -11,6 +11,6 @@ test('app renders without crashing', () => {
   // Simply render the App component
   // Render the App component into the root element in the HTML
   // ReactDOM.render(<App />, document.getElementById('root'));
-  console.log('Hello world')
-    // throw new Error('Hello world')
+//   console.log('Hello world')
+    throw new Error('Hello world')
 });
