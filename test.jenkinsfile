@@ -166,6 +166,10 @@ pipeline {
                         sudo echo '[dev-server]
                         ${env.EC2_PUBLIC_IP}' > /etc/ansible/hosts
                     """
+
+                    sh """
+                        ssh-copy-id -i /home/ansibleadmin/.ssh/id_rsa.pub ${env.EC2_PUBLIC_IP}
+                    """
                 }
             }
         }
