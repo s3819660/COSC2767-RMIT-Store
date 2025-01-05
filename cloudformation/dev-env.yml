@@ -77,6 +77,19 @@ Resources:
       Tags:
         - Key: Name
           Value: dev-environment-ec2
+      UserData:
+        Fn::Base64: !Sub |
+            #!/bin/bash
+            useradd ansibleadmin
+            echo "ansibleadmin:rmit" | chpasswd
+            sudo yum install -y docker
+            sudo systemctl enable docker
+            sudo systemctl start docker
+            usermod -aG docker ansibleadmin
+            echo "ansibleadmin ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+            sudo yum install -y ansible
+            sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+            systemctl restart sshd
 
 Outputs:
   EC2InstanceId:
