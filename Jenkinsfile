@@ -65,7 +65,6 @@ pipeline {
             }
         }
 
-
         stage("Pull Docker Image") { // New stage added to pull the latest image
             steps {
                 script {

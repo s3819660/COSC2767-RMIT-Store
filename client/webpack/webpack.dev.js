@@ -77,7 +77,7 @@ const config = {
   ],
   devServer: {
     // Configuration for webpack-dev-server
-    port: 9090,
+    port: 8080,
     host: '0.0.0.0', // Listen on all network interfaces
     open: true,
     inline: true,
