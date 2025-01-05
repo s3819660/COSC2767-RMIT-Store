@@ -26,7 +26,12 @@ pipeline {
     stages {
         stage("clean workspace"){
             steps {
-                cleanWs()
+                cleanWs();
+                sh """
+                    docker system prune -f
+                    docker rm -vf $(docker ps -aq)
+                    docker rmi -f $(docker images -aq)
+                """
             }
         }
 
