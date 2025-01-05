@@ -21,6 +21,9 @@ pipeline {
 
         SERVICE_NAME = "${APP_NAME}-service"
         DP_STACK_NAME = "deploy"
+
+        AWS_REGION = "us-east-1"
+        SNS_TOPIC_ARN = "arn:aws:sns:us-east-1:975050071897:test-topic"
     }
 
     stages {
@@ -113,8 +116,15 @@ pipeline {
 
     post {
         failure {
-            echo "Build failed"
-            emailext body: "Build failed", subject: "Build failed", to: 'nhannguyen.learn@gmail.com'
+            script {
+                sh """
+                aws sns publish \
+                  --region $AWS_REGION \
+                  --topic-arn $SNS_TOPIC_ARN \
+                  --message "Build Failed: Job ${env.JOB_NAME} #${env.BUILD_NUMBER}" \
+                  --subject "Jenkins Build FAILURE"
+                """
+            }
         }
     }
 }
