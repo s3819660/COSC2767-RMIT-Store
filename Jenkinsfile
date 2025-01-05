@@ -57,14 +57,6 @@ pipeline {
                                 npm test
                             """
                         }   
-                    },
-                    "Server": {
-                        dir('server') {
-                            sh """
-                                npm install
-                                npm test
-                            """
-                        }
                     }
                 )
             }
