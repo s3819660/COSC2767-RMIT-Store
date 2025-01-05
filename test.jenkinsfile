@@ -136,6 +136,8 @@ pipeline {
                                 --stack-name MyDevEnv \
                                 --query "Stacks[0].Outputs"
                         ''', returnStdout: true).trim()
+
+                        echo "${stackOutputs}"
                     }
                 }
             }

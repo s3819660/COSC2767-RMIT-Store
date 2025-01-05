@@ -76,7 +76,7 @@ Resources:
       ImageId: ami-01816d07b1128cd2d  # Example Amazon Linux 2 AMI in us-east-1
       Tags:
         - Key: Name
-          Value: dev-environment-ec2-2
+          Value: dev-environment-ec2
 
 Outputs:
   EC2InstanceId:
