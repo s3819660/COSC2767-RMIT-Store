@@ -162,10 +162,10 @@ pipeline {
         stage('Ansible Test') {
             steps {
                 script {
-                    sh '''
-                        sudo echo "[dev-server]
-                        ${env.EC2_PUBLIC_IP}" > /etc/ansible/hosts
-                    '''
+                    sh """
+                        sudo echo '[dev-server]
+                        ${env.EC2_PUBLIC_IP}' > /etc/ansible/hosts
+                    """
                 }
             }
         }
