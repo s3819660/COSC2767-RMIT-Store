@@ -171,7 +171,7 @@ pipeline {
                     // Add the EC2 instance to the known hosts file
                     sh """
                         if [ ! -f /home/ansibleadmin/.ssh/known_hosts ]; then
-                            mkdir -p /var/lib/./.ssh
+                            mkdir -p /home/ansibleadmin/.ssh
                             ssh-keyscan ${env.EC2_PUBLIC_IP} > /home/ansibleadmin/.ssh/known_hosts
                         else
                             ssh-keyscan ${env.EC2_PUBLIC_IP} >> /home/ansibleadmin/.ssh/known_hosts
