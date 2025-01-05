@@ -114,6 +114,16 @@ pipeline {
                 dir('cloudformation') {
                     script {
                         sh '''
+                            aws cloudformation delete-stack --stack-name MyDevEnv
+                        '''
+
+                        // Wait for the stack to be deleted
+                        sh '''
+                            aws cloudformation wait stack-delete-complete \
+                                --stack-name MyDevEnv
+                        '''
+
+                        sh '''
                             aws cloudformation deploy \
                                 --template-file dev-env.yml \
                                 --stack-name MyDevEnv \
@@ -137,7 +147,13 @@ pipeline {
                                 --query "Stacks[0].Outputs"
                         ''', returnStdout: true).trim()
 
-                        echo "${stackOutputs}"
+                        // Parse the outputs to extract values
+                        def outputs = readJSON text: stackOutputs
+
+                        // Extract specific output values
+                        def ec2PublicIp = outputs.find { it.OutputKey == "EC2PublicIP" }?.OutputValue
+                        // Store the values in environment variables for use in subsequent stages
+                        env.EC2_PUBLIC_IP = ec2PublicIp
                     }
                 }
             }
@@ -147,7 +163,8 @@ pipeline {
             steps {
                 script {
                     sh '''
-                        sudo echo '[dev-server]' > /etc/ansible/hosts
+                        sudo echo "[dev-server]
+                        ${env.EC2_PUBLIC_IP}" > /etc/ansible/hosts
                     '''
                 }
             }
