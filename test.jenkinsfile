@@ -24,10 +24,10 @@ pipeline {
         DEVOPS_PROJECT_KEY="devops_project_key_another_acc"
         // GIT_BRANCH="phuc/copy_ssh_using_user_data"
         GIT_BRANCH="phuc/deploy_test_server"
-        VPC_ID="vpc-039718b6ccffe8eec"
-        // VPC_ID="vpc-087ade8aa993e0b95"
-        SUBNET_ID="subnet-03d995dcd4d22e5b9"
-        // SUBNET_ID="	subnet-0b1d2b67dccb76fb1"
+        // VPC_ID="vpc-039718b6ccffe8eec"
+        VPC_ID="vpc-087ade8aa993e0b95"
+        // SUBNET_ID="subnet-03d995dcd4d22e5b9"
+        SUBNET_ID="	subnet-0b1d2b67dccb76fb1"
     }
 
     stages {
