@@ -183,7 +183,7 @@ pipeline {
                     """
 
                     sh """
-                        sudo su - ansibleadmin ansible -m ping all
+                        sudo -u ansibleadmin ansible -m ping all
                     """
 
                     // // Add the EC2 instance to the known hosts file
