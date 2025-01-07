@@ -26,6 +26,7 @@ pipeline {
         SNS_TOPIC_ARN = "arn:aws:sns:us-east-1:975050071897:test-topic"
 
         ANSIBLE_SERVER = "54.146.173.204"
+        ANSIBLE_CREDENTIALS = "ansibleadmin"
     }
 
     stages {
@@ -119,9 +120,9 @@ pipeline {
 // setup environment for ansible
         stage('Setup Environment') {
             steps {
-                sshagent(['ansibleadmin']) {
+                sshagent([ANSIBLE_CREDENTIALS]) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no ${ANSIBLE_SERVER} "echo 'Connected to Ansible server'"
+                    ssh -o StrictHostKeyChecking=no ${ANSIBLE_SERVER}
                     """
                 }
             }
@@ -131,7 +132,7 @@ pipeline {
             steps {
                 dir('cloudformation') {
                     script {
-                    sshagent(['ansibleadmin']) {
+                    sshagent([ANSIBLE_CREDENTIALS]) {
                         // This code fails ansible connect to ansible workers, please don't uncomment
                         // sh '''
                         //     aws cloudformation delete-stack --stack-name MyDevEnv
@@ -189,7 +190,7 @@ pipeline {
 
         stage('Ansible Connect to Worker EC2') {
             steps {
-                sshagent(['ansibleadmin']) {
+                sshagent([ANSIBLE_CREDENTIALS]) {
                     // Add the EC2 instance to the Ansible inventory file
                     sh """
                         sudo echo '[TestDevServer]
@@ -201,7 +202,7 @@ pipeline {
         
         stage("Ansible Playbook") {
             steps {
-                sshagent(['ansibleadmin']) {
+                sshagent([ANSIBLE_CREDENTIALS]) {
                     sh '''
                         ansible-playbook /home/ansibleadmin/PullAndRunFe.yml
                     '''
