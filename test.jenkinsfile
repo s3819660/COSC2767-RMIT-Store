@@ -21,6 +21,7 @@ pipeline {
 
         SERVICE_NAME = "${APP_NAME}-service"
         DP_STACK_NAME = "deploy"
+        DEVOPS_PROJECT_KEY="devops_project_key_another_acc"
     }
 
     stages {
@@ -134,7 +135,7 @@ pipeline {
                                 --stack-name MyDevEnv \
                                 --capabilities CAPABILITY_IAM \
                                 --parameter-overrides \
-                                    KeyName=devops_project_key \
+                                    KeyName=${DEVOPS_PROJECT_KEY} \
                                     VpcId=vpc-039718b6ccffe8eec \
                                     SubnetId=subnet-03d995dcd4d22e5b9 \
                                     SshPubKey='${ssh_pub_key}'
