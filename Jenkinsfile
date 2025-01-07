@@ -130,6 +130,7 @@ pipeline {
     stage('CloudFormation Deploy') {
             steps {
                 dir('cloudformation') {
+                    script {
                     sshagent(['ansibleadmin']) {
                         // This code fails ansible connect to ansible workers, please don't uncomment
                         // sh '''
@@ -180,6 +181,7 @@ pipeline {
                         // Store the values in environment variables for use in subsequent stages
                         env.EC2_PUBLIC_IP = ec2PublicIp
                     }
+                }
                 }
             }
         }
