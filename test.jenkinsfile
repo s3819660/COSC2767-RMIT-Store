@@ -22,6 +22,8 @@ pipeline {
         SERVICE_NAME = "${APP_NAME}-service"
         DP_STACK_NAME = "deploy"
         DEVOPS_PROJECT_KEY="devops_project_key_another_acc"
+        // GIT_BRANCH="phuc/copy_ssh_using_user_data"
+        GIT_BRANCH="phuc/deploy_test_server"
         // VPC_ID="vpc-039718b6ccffe8eec"
         VPC_ID="vpc-087ade8aa993e0b95"
         // SUBNET_ID="subnet-03d995dcd4d22e5b9"
@@ -48,7 +50,7 @@ pipeline {
         // checkout code from source code
         stage("Checkout from SCM"){ 
             steps {
-                git branch: "phuc/copy_ssh_using_user_data", url: "https://github.com/s3819660/COSC2767-RMIT-Store.git"
+                git branch: "${GIT_BRANCH}", url: "https://github.com/s3819660/COSC2767-RMIT-Store.git"
             }
         }
 
