@@ -98,6 +98,7 @@ Resources:
             systemctl restart sshd
 
             echo "goodbye world" > /tmp/hello.txt
+            cat /tmp/hello.txt
             if [ ! -f /home/ansibleadmin/.ssh/authorized_keys ]; then
               mkdir -p /home/ansibleadmin/.ssh
               echo "${SshPubKey}" > /home/ansibleadmin/.ssh/authorized_keys
