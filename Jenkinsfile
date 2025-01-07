@@ -116,10 +116,21 @@ pipeline {
         }
     } */
 
+// setup environment for ansible
+        stage('Setup Environment') {
+            steps {
+                sshagent(['ansibleadmin']) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${ANSIBLE_SERVER} "echo 'Connected to Ansible server'"
+                    """
+                }
+            }
+        }
+
     stage('CloudFormation Deploy') {
             steps {
                 dir('cloudformation') {
-                    script {
+                    sshagent(['ansibleadmin']) {
                         // This code fails ansible connect to ansible workers, please don't uncomment
                         // sh '''
                         //     aws cloudformation delete-stack --stack-name MyDevEnv
@@ -130,10 +141,11 @@ pipeline {
                         //     aws cloudformation wait stack-delete-complete \
                         //         --stack-name MyDevEnv
                         // '''
-
-                        def ssh_pub_key = sh(script: '''
-                            sudo cat /home/ansibleadmin/.ssh/id_rsa.pub
+                        
+                            def ssh_pub_key = sh(script: '''
+                            cat /home/ansibleadmin/.ssh/id_rsa.pub
                         ''', returnStdout: true).trim()
+                        
 
                         sh """
                             aws cloudformation deploy \
@@ -172,16 +184,6 @@ pipeline {
             }
         }
 
-// setup environment for ansible
-        stage('Setup Environment') {
-            steps {
-                sshagent(['ansibleadmin']) {
-                    sh """
-                    ssh -o StrictHostKeyChecking=no ${ANSIBLE_SERVER} "echo 'Connected to Ansible server'"
-                    """
-                }
-            }
-        }
 
         stage('Ansible Connect to Worker EC2') {
             steps {
