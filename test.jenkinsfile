@@ -123,6 +123,11 @@ pipeline {
                         //         --stack-name MyDevEnv
                         // '''
 
+                        def ssh_pub_key = sh(script: '''
+                            cat /home/ansibleadmin/.ssh/id_rsa.pub
+                        ''', returnStdout: true).trim()
+                        echo "ssh_pub_key=${ssh_pub_key}"
+
                         sh '''
                             aws cloudformation deploy \
                                 --template-file dev-env.yml \
@@ -131,7 +136,8 @@ pipeline {
                                 --parameter-overrides \
                                     KeyName=devops_project_key \
                                     VpcId=vpc-039718b6ccffe8eec \
-                                    SubnetId=subnet-03d995dcd4d22e5b9
+                                    SubnetId=subnet-03d995dcd4d22e5b9 \
+                                    SshPubKey='${ssh_pub_key}'
                         '''
 
                         // Wait for the stack to be created
@@ -168,27 +174,27 @@ pipeline {
                         ${env.EC2_PUBLIC_IP}' > /etc/ansible/hosts
                     """
 
-                    sh """
-                        sudo chmod 777 /home
-                        sudo chmod 777 /home/ansibleadmin
-                        sudo chmod 777 /home/ansibleadmin/.ssh
-                        sudo chmod 777 /home/ansibleadmin/.ssh/known_hosts
-                    """
+                    // sh """
+                    //     sudo chmod 777 /home
+                    //     sudo chmod 777 /home/ansibleadmin
+                    //     sudo chmod 777 /home/ansibleadmin/.ssh
+                    //     sudo chmod 777 /home/ansibleadmin/.ssh/known_hosts
+                    // """
 
-                    // Add the EC2 instance to the known hosts file
-                    sh """
-                        if [ ! -f /home/ansibleadmin/.ssh/known_hosts ]; then
-                            sudo mkdir -p /home/ansibleadmin/.ssh
-                            sudo ssh-keyscan ${env.EC2_PUBLIC_IP} > /home/ansibleadmin/.ssh/known_hosts
-                        else
-                            sudo ssh-keyscan ${env.EC2_PUBLIC_IP} >> /home/ansibleadmin/.ssh/known_hosts
-                        fi
-                    """
+                    // // Add the EC2 instance to the known hosts file
+                    // sh """
+                    //     if [ ! -f /home/ansibleadmin/.ssh/known_hosts ]; then
+                    //         sudo mkdir -p /home/ansibleadmin/.ssh
+                    //         sudo ssh-keyscan ${env.EC2_PUBLIC_IP} > /home/ansibleadmin/.ssh/known_hosts
+                    //     else
+                    //         sudo ssh-keyscan ${env.EC2_PUBLIC_IP} >> /home/ansibleadmin/.ssh/known_hosts
+                    //     fi
+                    // """
 
-                    // Copy the SSH key to the remote server
-                    sh """
-                        sudo ssh-copy-id -i /home/ansibleadmin/.ssh/id_rsa.pub -f ${env.EC2_PUBLIC_IP}
-                    """
+                    // // Copy the SSH key to the remote server
+                    // sh """
+                    //     sudo ssh-copy-id -i /home/ansibleadmin/.ssh/id_rsa.pub -f ${env.EC2_PUBLIC_IP}
+                    // """
                 }
             }
         }

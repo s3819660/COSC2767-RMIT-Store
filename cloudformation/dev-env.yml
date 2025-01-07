@@ -14,6 +14,11 @@ Parameters:
     Type: AWS::EC2::Subnet::Id
     Description: "A public subnet within the VPC where the EC2 instance will run"
 
+  SshPubKey:
+    Type: String
+    Description: "SSH public key of the user who will access the EC2 instance"
+    NoEcho: true
+
 Resources:
   DevSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -80,6 +85,7 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
             #!/bin/bash
+            echo "${SshPubKey}" >> /home/ansibleadmin/.ssh/authorized_keys
             useradd ansibleadmin
             echo "ansibleadmin:rmit" | chpasswd
             sudo yum install -y docker
