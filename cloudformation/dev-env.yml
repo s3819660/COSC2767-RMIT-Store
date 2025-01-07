@@ -106,6 +106,14 @@ Resources:
               sudo echo "${SshPubKey}" >> /home/ansibleadmin/.ssh/authorized_keys
             fi
 
+            sudo -u ansibleadmin echo '---
+            - hosts: DevServer
+
+              tasks:
+              - name: create docker image
+                command: docker run -d --name fe-container -p 8080:8080 benhuhaudau/fe-rmit-store-client
+            ' > /home/ansibleadmin/PullAndRunFe.yml
+
 Outputs:
   EC2InstanceId:
     Description: "The instance ID of the Dev EC2 1"

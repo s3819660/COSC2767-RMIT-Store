@@ -113,6 +113,7 @@ pipeline {
             steps {
                 dir('cloudformation') {
                     script {
+                        // This code fails ansible connect to ansible workers, please don't uncomment
                         // sh '''
                         //     aws cloudformation delete-stack --stack-name MyDevEnv
                         // '''
@@ -174,11 +175,9 @@ pipeline {
                     """
 
                     sh """
-                        sudo chmod 777 /home
-                        sudo chmod 777 /home/ansibleadmin
-                        sudo chmod 777 /home/ansibleadmin/.ssh
-                        sudo chmod 777 /home/ansibleadmin/.ssh/known_hosts
-                        sudo chmod 777 /home/ansibleadmin/.ssh/id_rsa
+                        sudo chmod 644 /home/ansibleadmin/.ssh
+                        sudo chmod 644 /home/ansibleadmin/.ssh/known_hosts
+                        sudo chmod 644 /home/ansibleadmin/.ssh/id_rsa
                     """
 
                     sh """
@@ -204,15 +203,15 @@ pipeline {
             }
         }
         
-        // stage("Ansible") {
-        //     steps {
-        //         script {
-        //             sh '''
-        //                 ansible-playbook playbook.yml
-        //             '''
-        //         }
-        //     }
-        // }
+        stage("Ansible Playbook") {
+            steps {
+                script {
+                    sh '''
+                        sudo -u ansibleadmin ansible-playbook /home/ansibleadmin/PullAndRunFe.yml
+                    '''
+                }
+            }
+        }
     }
 
     post {
