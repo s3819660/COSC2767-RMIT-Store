@@ -170,12 +170,12 @@ pipeline {
                 script {
                     // Add the EC2 instance to the Ansible inventory file
                     sh """
-                        sudo echo '[dev-server]
+                        sudo echo '[DevServer]
                         ${env.EC2_PUBLIC_IP}' > /etc/ansible/hosts
                     """
 
                     sh """
-                        ansible -m ping all
+                        ansible -m ping all --ssh-common-args="-o StrictHostKeyChecking=no"
                     """
 
                     // sh """
