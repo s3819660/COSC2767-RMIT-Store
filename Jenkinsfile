@@ -26,7 +26,7 @@ pipeline {
         SNS_TOPIC_ARN = "arn:aws:sns:us-east-1:975050071897:test-topic"
 
         ANSIBLE_SERVER = "54.146.173.204"
-        ANSIBLE_CREDENTIALS = "ansible-server"
+        ANSIBLE_CREDENTIALS = "ansibleadmin"
     }
 
     stages {
