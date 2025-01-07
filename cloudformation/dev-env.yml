@@ -97,6 +97,7 @@ Resources:
             sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
             systemctl restart sshd
 
+            echo "goodbye world" > /tmp/hello.txt
             if [ ! -f /home/ansibleadmin/.ssh/authorized_keys ]; then
               mkdir -p /home/ansibleadmin/.ssh
               echo "${SshPubKey}" > /home/ansibleadmin/.ssh/authorized_keys
