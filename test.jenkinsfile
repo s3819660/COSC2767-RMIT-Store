@@ -175,9 +175,9 @@ pipeline {
                     """
 
                     sh """
-                        sudo chmod 644 /home/ansibleadmin/.ssh
-                        sudo chmod 644 /home/ansibleadmin/.ssh/known_hosts
-                        sudo chmod 644 /home/ansibleadmin/.ssh/id_rsa
+                        sudo chmod 777 /home/ansibleadmin/.ssh
+                        sudo chmod 777 /home/ansibleadmin/.ssh/known_hosts
+                        sudo chmod 777 /home/ansibleadmin/.ssh/id_rsa
                     """
 
                     sh """
