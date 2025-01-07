@@ -118,12 +118,10 @@ pipeline {
     } */
 
 // setup environment for ansible
-        stage('Setup Environment') {
+        stage("Setup Environment") {
             steps {
                 sshagent([ANSIBLE_CREDENTIALS]) {
-                    sh """
-                    ssh -o StrictHostKeyChecking=no ${ANSIBLE_SERVER}
-                    """
+                    sh "ssh -o StrictHostKeyChecking=no &{ANSIBLE_SERVER}"
                 }
             }
         }
@@ -209,7 +207,7 @@ pipeline {
                 }
             }
         }
-    }
+    
 
     // post {
     //     failure {
@@ -223,5 +221,5 @@ pipeline {
     //             """
     //         }
     //     }
-    // }
+    }
 }
