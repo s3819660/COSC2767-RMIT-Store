@@ -22,6 +22,10 @@ pipeline {
         SERVICE_NAME = "${APP_NAME}-service"
         DP_STACK_NAME = "deploy"
         DEVOPS_PROJECT_KEY="devops_project_key_another_acc"
+        // VPC_ID="vpc-039718b6ccffe8eec"
+        VPC_ID="vpc-087ade8aa993e0b95"
+        // SUBNET_ID="subnet-03d995dcd4d22e5b9"
+        SUBNET_ID="	subnet-0b1d2b67dccb76fb1"
     }
 
     stages {
@@ -136,8 +140,8 @@ pipeline {
                                 --capabilities CAPABILITY_IAM \
                                 --parameter-overrides \
                                     KeyName=${DEVOPS_PROJECT_KEY} \
-                                    VpcId=vpc-039718b6ccffe8eec \
-                                    SubnetId=subnet-03d995dcd4d22e5b9 \
+                                    VpcId=${VPC_ID} \
+                                    SubnetId=${SUBNET_ID} \
                                     SshPubKey='${ssh_pub_key}'
                         """
 
