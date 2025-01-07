@@ -183,7 +183,7 @@ pipeline {
                     """
 
                     sh """
-                        sudo -u ansibleadmin ansible -m ping all --ssh-common-args="-o StrictHostKeyChecking=no"
+                        sudo -u ansibleadmin ansible -m ping all --private-key=/home/ansibleadmin/.ssh/id_rsa --ssh-common-args="-o StrictHostKeyChecking=no"
                     """
 
                     // // Add the EC2 instance to the known hosts file
