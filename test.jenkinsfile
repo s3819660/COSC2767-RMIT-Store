@@ -188,6 +188,7 @@ pipeline {
                         sudo chmod 777 /home/ansibleadmin/.ssh
                         sudo chmod 777 /home/ansibleadmin/.ssh/known_hosts
                         sudo chmod 777 /home/ansibleadmin/.ssh/id_rsa
+                        ls -l /home/ansibleadmin/.ssh/id_rsa
                         sudo -u ansibleadmin ansible -m ping all --private-key=/home/ansibleadmin/.ssh/id_rsa -vvv
                     """
 
