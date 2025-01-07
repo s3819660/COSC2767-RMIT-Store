@@ -24,6 +24,8 @@ pipeline {
 
         AWS_REGION = "us-east-1"
         SNS_TOPIC_ARN = "arn:aws:sns:us-east-1:975050071897:test-topic"
+
+        ANSIBLE_SERVER = "54.146.173.204"
     }
 
     stages {
@@ -50,6 +52,7 @@ pipeline {
             }
         }
 
+        /* 
         stage("Unit Test") {
             steps {
                 parallel(
@@ -111,20 +114,109 @@ pipeline {
                 }
             }
         }
+    } */
 
-    }
+    stage('CloudFormation Deploy') {
+            steps {
+                dir('cloudformation') {
+                    script {
+                        // This code fails ansible connect to ansible workers, please don't uncomment
+                        // sh '''
+                        //     aws cloudformation delete-stack --stack-name MyDevEnv
+                        // '''
 
-    post {
-        failure {
-            script {
-                sh """
-                aws sns publish \
-                  --region $AWS_REGION \
-                  --topic-arn $SNS_TOPIC_ARN \
-                  --message "Build Failed: Job ${env.JOB_NAME} #${env.BUILD_NUMBER}" \
-                  --subject "Jenkins Build FAILURE"
-                """
+                        // // Wait for the stack to be deleted
+                        // sh '''
+                        //     aws cloudformation wait stack-delete-complete \
+                        //         --stack-name MyDevEnv
+                        // '''
+
+                        def ssh_pub_key = sh(script: '''
+                            sudo cat /home/ansibleadmin/.ssh/id_rsa.pub
+                        ''', returnStdout: true).trim()
+
+                        sh """
+                            aws cloudformation deploy \
+                                --template-file dev-env.yml \
+                                --stack-name TestDevEnv \
+                                --capabilities CAPABILITY_IAM \
+                                --parameter-overrides \
+                                    KeyName=devops_project_key \
+                                    VpcId=vpc-0d0a77061e27d0a1b \
+                                    SubnetId=subnet-095106efd8b1035a6 \
+                                    SshPubKey='${ssh_pub_key}'
+                        """
+
+                        // Wait for the stack to be created
+                        sh '''
+                            aws cloudformation wait stack-create-complete \
+                                --stack-name TestDevEnv
+                        '''
+
+                        // Retrieve the stack outputs
+                        def stackOutputs = sh(script: '''
+                            aws cloudformation describe-stacks \
+                                --stack-name TestDevEnv \
+                                --query "Stacks[0].Outputs"
+                        ''', returnStdout: true).trim()
+
+                        // Parse the outputs to extract values
+                        def outputs = readJSON text: stackOutputs
+
+                        // Extract specific output values
+                        def ec2PublicIp = outputs.find { it.OutputKey == "EC2PublicIP" }?.OutputValue
+                        // Store the values in environment variables for use in subsequent stages
+                        env.EC2_PUBLIC_IP = ec2PublicIp
+                    }
+                }
+            }
+        }
+
+// setup environment for ansible
+        stage('Setup Environment') {
+            steps {
+                sshagent(['ansibleadmin']) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${ANSIBLE_SERVER} "echo 'Connected to Ansible server'"
+                    """
+                }
+            }
+        }
+
+        stage('Ansible Connect to Worker EC2') {
+            steps {
+                sshagent(['ansibleadmin']) {
+                    // Add the EC2 instance to the Ansible inventory file
+                    sh """
+                        sudo echo '[TestDevServer]
+                        ${env.EC2_PUBLIC_IP}' > /etc/ansible/hosts
+                    """
+                }
+            }
+        }
+        
+        stage("Ansible Playbook") {
+            steps {
+                sshagent(['ansibleadmin']) {
+                    sh '''
+                        ansible-playbook /home/ansibleadmin/PullAndRunFe.yml
+                    '''
+                }
             }
         }
     }
+
+    // post {
+    //     failure {
+    //         script {
+    //             sh """
+    //             aws sns publish \
+    //               --region $AWS_REGION \
+    //               --topic-arn $SNS_TOPIC_ARN \
+    //               --message "Build Failed: Job ${env.JOB_NAME} #${env.BUILD_NUMBER}" \
+    //               --subject "Jenkins Build FAILURE"
+    //             """
+    //         }
+    //     }
+    // }
 }

@@ -1,0 +1,86 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Dev/Test environment with a single EC2 for frontend + backend, and open ports
+
+Parameters:
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: "Name of an existing EC2 KeyPair for SSH access"
+
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: "ID of an existing VPC (e.g., your default VPC)"
+
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Description: "A public subnet within the VPC where the EC2 instance will run"
+
+Resources:
+  DevSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Allow inbound for dev/test environment"
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        # SSH (22)
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+
+        # HTTP (80)
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+        # HTTPS (443)
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+
+        # Backend or dev server (8080)
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: 0.0.0.0/0
+
+        # MongoDB default port (27017)
+        - IpProtocol: tcp
+          FromPort: 27017
+          ToPort: 27017
+          CidrIp: 0.0.0.0/0
+
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      
+      Tags:
+        - Key: Name
+          Value: dev-environment-sg
+
+  DevEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      KeyName: !Ref KeyName
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds:
+        - !GetAtt DevSecurityGroup.GroupId
+      ImageId: ami-0c55b159cbfafe1f0  # Example Amazon Linux 2 AMI in us-east-1
+      Tags:
+        - Key: Name
+          Value: dev-environment-ec2
+
+Outputs:
+  EC2InstanceId:
+    Description: "The instance ID of the Dev EC2"
+    Value: !Ref DevEC2Instance
+
+  EC2PublicIP:
+    Description: "Public IP of the Dev EC2 (if subnet auto-assigns public IP)"
+    Value: !GetAtt DevEC2Instance.PublicIp
+
+  SecurityGroupId:
+    Description: "The ID of the security group"
+    Value: !GetAtt DevSecurityGroup.GroupId
