@@ -175,15 +175,15 @@ pipeline {
                     """
 
                     sh """
-                        ansible -m ping all --ssh-common-args="-o StrictHostKeyChecking=no"
+                        sudo chmod 777 /home
+                        sudo chmod 777 /home/ansibleadmin
+                        sudo chmod 777 /home/ansibleadmin/.ssh
+                        sudo chmod 777 /home/ansibleadmin/.ssh/known_hosts
                     """
 
-                    // sh """
-                    //     sudo chmod 777 /home
-                    //     sudo chmod 777 /home/ansibleadmin
-                    //     sudo chmod 777 /home/ansibleadmin/.ssh
-                    //     sudo chmod 777 /home/ansibleadmin/.ssh/known_hosts
-                    // """
+                    sh """
+                        ansible -m ping all --ssh-common-args="-o StrictHostKeyChecking=no"
+                    """
 
                     // // Add the EC2 instance to the known hosts file
                     // sh """
