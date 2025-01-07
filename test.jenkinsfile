@@ -125,7 +125,7 @@ pipeline {
                         // '''
 
                         def ssh_pub_key = sh(script: '''
-                            cat /home/ansibleadmin/.ssh/id_rsa.pub
+                            sudo cat /home/ansibleadmin/.ssh/id_rsa.pub
                         ''', returnStdout: true).trim()
 
                         sh """
