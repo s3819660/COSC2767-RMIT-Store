@@ -121,7 +121,7 @@ pipeline {
         stage("Setup Environment") {
             steps {
                 sshagent([ANSIBLE_CREDENTIALS]) {
-                    sh "ssh -o StrictHostKeyChecking=no &{ANSIBLE_SERVER}"
+                    sh "ssh -o StrictHostKeyChecking=no ansibleadmin${ANSIBLE_SERVER}"
                 }
             }
         }
