@@ -85,13 +85,6 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
             #!/bin/bash
-
-            if [ ! -f /home/ansibleadmin/.ssh/authorized_keys ]; then
-              sudo mkdir -p /home/ansibleadmin/.ssh
-              echo "${SshPubKey}" > /home/ansibleadmin/.ssh/authorized_keys
-            else
-              echo "${SshPubKey}" >> /home/ansibleadmin/.ssh/authorized_keys
-            fi
             
             useradd ansibleadmin
             echo "ansibleadmin:rmit" | chpasswd
@@ -103,6 +96,13 @@ Resources:
             sudo yum install -y ansible
             sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
             systemctl restart sshd
+
+            if [ ! -f /home/ansibleadmin/.ssh/authorized_keys ]; then
+              mkdir -p /home/ansibleadmin/.ssh
+              echo "${SshPubKey}" > /home/ansibleadmin/.ssh/authorized_keys
+            else
+              echo "${SshPubKey}" >> /home/ansibleadmin/.ssh/authorized_keys
+            fi
 
 Outputs:
   EC2InstanceId:
