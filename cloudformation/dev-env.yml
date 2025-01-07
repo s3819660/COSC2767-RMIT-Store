@@ -87,6 +87,7 @@ Resources:
             #!/bin/bash
             
             echo "sshpubkey ${SshPubKey}"
+
             useradd ansibleadmin
             echo "ansibleadmin:rmit" | chpasswd
             sudo yum install -y docker
@@ -98,8 +99,6 @@ Resources:
             sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
             systemctl restart sshd
 
-            echo "goodbye world" > /tmp/hello.txt
-            cat /tmp/hello.txt
             if [ ! -f /home/ansibleadmin/.ssh/authorized_keys ]; then
               sudo mkdir -p /home/ansibleadmin/.ssh
               sudo echo "${SshPubKey}" > /home/ansibleadmin/.ssh/authorized_keys
