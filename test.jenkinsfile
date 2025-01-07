@@ -43,7 +43,7 @@ pipeline {
         // checkout code from source code
         stage("Checkout from SCM"){ 
             steps {
-                git branch: "main", url: "https://github.com/s3819660/COSC2767-RMIT-Store.git"
+                git branch: "phuc/copy_ssh_using_user_data", url: "https://github.com/s3819660/COSC2767-RMIT-Store.git"
             }
         }
 
