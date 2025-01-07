@@ -174,6 +174,10 @@ pipeline {
                         ${env.EC2_PUBLIC_IP}' > /etc/ansible/hosts
                     """
 
+                    sh """
+                        ansible -m ping all
+                    """
+
                     // sh """
                     //     sudo chmod 777 /home
                     //     sudo chmod 777 /home/ansibleadmin
