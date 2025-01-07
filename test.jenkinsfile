@@ -50,7 +50,7 @@ pipeline {
         // checkout code from source code
         stage("Checkout from SCM"){ 
             steps {
-                git branch: "${GIT_BRANCH}", url: "https://github.com/s3819660/COSC2767-RMIT-Store.git"
+                git branch: "phuc/deploy_test_server", url: "https://github.com/s3819660/COSC2767-RMIT-Store.git"
             }
         }
 
