@@ -141,9 +141,9 @@ pipeline {
                                 --stack-name MyDevEnv \
                                 --capabilities CAPABILITY_IAM \
                                 --parameter-overrides \
-                                    KeyName=${DEVOPS_PROJECT_KEY} \
-                                    VpcId=${VPC_ID} \
-                                    SubnetId=${SUBNET_ID} \
+                                    KeyName=devops_project_key_another_acc \
+                                    VpcId=vpc-087ade8aa993e0b95 \
+                                    SubnetId=subnet-0b1d2b67dccb76fb1 \
                                     SshPubKey='${ssh_pub_key}'
                         """
 
