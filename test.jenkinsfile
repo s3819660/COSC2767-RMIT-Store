@@ -207,6 +207,16 @@ pipeline {
             steps {
                 script {
                     sh '''
+                        sudo -u ansibleadmin echo '---
+    - hosts: DevServer
+
+    tasks:
+    - name: create docker image
+        command: docker run -d --name fe-container -p 8080:8080 benhuhaudau/fe-rmit-store-client
+' > /home/ansibleadmin/PullAndRunFe.yml
+                    '''
+
+                    sh '''
                         sudo -u ansibleadmin ansible-playbook /home/ansibleadmin/PullAndRunFe.yml
                     '''
                 }
