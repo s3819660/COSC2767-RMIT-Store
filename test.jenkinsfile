@@ -208,11 +208,11 @@ pipeline {
                 script {
                     sh '''
                         sudo -u ansibleadmin echo '---
-    - hosts: DevServer
+- hosts: DevServer
 
-    tasks:
-    - name: create docker image
-        command: docker run -d --name fe-container -p 8080:8080 benhuhaudau/fe-rmit-store-client
+  tasks:
+  - name: create docker image
+    command: docker run -d --name fe-container -p 8080:8080 benhuhaudau/fe-rmit-store-client
 ' > /home/ansibleadmin/PullAndRunFe.yml
                     '''
 
