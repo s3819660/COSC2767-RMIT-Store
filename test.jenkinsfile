@@ -182,6 +182,7 @@ pipeline {
                     """
 
                     sh """
+                        sudo chmod 777 -R /home/ansibleadmin
                         sudo chmod 777 /home/ansibleadmin/.ssh
                         sudo chmod 777 /home/ansibleadmin/.ssh/known_hosts
                         sudo chmod 777 /home/ansibleadmin/.ssh/id_rsa
