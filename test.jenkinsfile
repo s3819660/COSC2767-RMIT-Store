@@ -221,7 +221,7 @@ pipeline {
 - hosts: DevServer
 
   tasks:
-  - name: create docker image
+  - name: pull and run docker image
     command: docker run -d --name fe-container -p 8080:8080 benhuhaudau/fe-rmit-store-client
 ' > /home/ansibleadmin/PullAndRunFe.yml
                     '''
