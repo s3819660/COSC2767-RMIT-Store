@@ -21,13 +21,13 @@ pipeline {
 
         SERVICE_NAME = "${APP_NAME}-service"
         DP_STACK_NAME = "deploy"
-        DEVOPS_PROJECT_KEY="devops_project_key_other_acc"
+        DEVOPS_PROJECT_KEY="devops_project_key_other_account"
         // GIT_BRANCH="phuc/copy_ssh_using_user_data"
         GIT_BRANCH="phuc/deploy_test_server"
         // VPC_ID="vpc-039718b6ccffe8eec"
         VPC_ID="vpc-087ade8aa993e0b95"
         // SUBNET_ID="subnet-03d995dcd4d22e5b9"
-        SUBNET_ID="subnet-0b1d2b67dccb76fb1"
+        SUBNET_ID="subnet-0cdee2f900148967a"
     }
 
     stages {
@@ -141,9 +141,9 @@ pipeline {
                                 --stack-name MyDevEnv \
                                 --capabilities CAPABILITY_IAM \
                                 --parameter-overrides \
-                                    KeyName=devops_project_key_other_acc \
+                                    KeyName=devops_project_key_other_account \
                                     VpcId=vpc-087ade8aa993e0b95 \
-                                    SubnetId=subnet-0b1d2b67dccb76fb1 \
+                                    SubnetId=subnet-0cdee2f900148967a \
                                     SshPubKey='${ssh_pub_key}'
                         """
 
