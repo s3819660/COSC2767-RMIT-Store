@@ -217,7 +217,7 @@ pipeline {
                     sh '''
                         sudo touch /home/ansibleadmin/PullAndRunFe.yml
 
-                        sudo echo '---
+                        sudo -u ansibleadmin echo '---
 - hosts: DevServer
 
   tasks:
