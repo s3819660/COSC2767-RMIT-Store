@@ -117,15 +117,6 @@ pipeline {
         }
     } */
 
-// setup environment for ansible
-        stage("Setup Environment") {
-            steps {
-                sshagent([ANSIBLE_CREDENTIALS]) {
-                    sh "ssh -o StrictHostKeyChecking=no ansibleadmin@${ANSIBLE_SERVER}"
-                }
-            }
-        }
-
     stage('CloudFormation Deploy') {
             steps {
                 dir('cloudformation') {
