@@ -121,7 +121,7 @@ pipeline {
             steps {
                 dir('cloudformation') {
                     script {
-                    sshagent([ANSIBLE_CREDENTIALS]) {
+                    script {
                         // This code fails ansible connect to ansible workers, please don't uncomment
                         // sh '''
                         //     aws cloudformation delete-stack --stack-name MyDevEnv
@@ -133,8 +133,8 @@ pipeline {
                         //         --stack-name MyDevEnv
                         // '''
                         
-                            def ssh_pub_key = sh(script: '''
-                            cat /home/ansibleadmin/.ssh/id_rsa.pub
+                        def ssh_pub_key = sh(script: '''
+                            sudo cat /home/ansibleadmin/.ssh/id_rsa.pub
                         ''', returnStdout: true).trim()
                         
 
