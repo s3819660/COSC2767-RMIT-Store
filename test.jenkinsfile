@@ -215,7 +215,6 @@ pipeline {
                 script {
                     sh '''
                         sudo chmod 600 /home/ansibleadmin/
-                        sudo chmod 600 /home/ansibleadmin/.ssh
                         sudo touch /home/ansibleadmin/PullAndRunFe.yml
 
                         sudo -u ansibleadmin echo '---
