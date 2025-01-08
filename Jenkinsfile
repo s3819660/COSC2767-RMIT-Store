@@ -179,11 +179,22 @@ pipeline {
 
         stage('Ansible Connect to Worker EC2') {
             steps {
-                sshagent([ANSIBLE_CREDENTIALS]) {
+                script {
                     // Add the EC2 instance to the Ansible inventory file
                     sh """
                         sudo echo '[TestDevServer]
                         ${env.EC2_PUBLIC_IP}' > /etc/ansible/hosts
+                    """
+
+                    sh """
+                        sudo chmod 777 /home/ansibleadmin/.ssh
+                        sudo chmod 777 /home/ansibleadmin/.ssh/known_hosts
+                        sudo chmod 777 /home/ansibleadmin/.ssh/id_rsa
+                    """
+
+                    sh """
+                        sudo -u ansibleadmin whoami
+                        sudo -u ansibleadmin ansible -m ping all
                     """
                 }
             }
@@ -191,9 +202,9 @@ pipeline {
         
         stage("Ansible Playbook") {
             steps {
-                sshagent([ANSIBLE_CREDENTIALS]) {
+                script {
                     sh '''
-                        ansible-playbook /home/ansibleadmin/PullAndRunFe.yml
+                        sudo -u ansibleadmin ansible-playbook /home/ansibleadmin/PullAndRunFe.yml
                     '''
                 }
             }
