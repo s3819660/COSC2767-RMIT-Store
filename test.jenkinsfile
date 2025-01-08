@@ -214,8 +214,10 @@ pipeline {
             steps {
                 script {
                     sh '''
-                        sudo chmod 660 /home/ansibleadmin/
-                        sudo -u ansibleadmin touch /home/ansibleadmin/PullAndRunFe.yml
+                        sudo chmod 600 /home/ansibleadmin/
+                        sudo chmod 600 /home/ansibleadmin/.ssh
+                        sudo touch /home/ansibleadmin/PullAndRunFe.yml
+
                         sudo -u ansibleadmin echo '---
 - hosts: DevServer
 
