@@ -121,7 +121,6 @@ pipeline {
             steps {
                 dir('cloudformation') {
                     script {
-                    script {
                         // This code fails ansible connect to ansible workers, please don't uncomment
                         // sh '''
                         //     aws cloudformation delete-stack --stack-name MyDevEnv
@@ -170,8 +169,8 @@ pipeline {
                         def ec2PublicIp = outputs.find { it.OutputKey == "EC2PublicIP" }?.OutputValue
                         // Store the values in environment variables for use in subsequent stages
                         env.EC2_PUBLIC_IP = ec2PublicIp
+                    
                     }
-                }
                 }
             }
         }
