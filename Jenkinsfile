@@ -123,13 +123,13 @@ pipeline {
                     script {
                         // This code fails ansible connect to ansible workers, please don't uncomment
                         sh '''
-                            aws cloudformation delete-stack --stack-name MyDevEnv
+                            aws cloudformation delete-stack --stack-name TestDevEnv
                         '''
 
                         // Wait for the stack to be deleted
                         sh '''
                             aws cloudformation wait stack-delete-complete \
-                                --stack-name MyDevEnv
+                                --stack-name TestDevEnv
                         '''
                         
                         def ssh_pub_key = sh(script: '''
