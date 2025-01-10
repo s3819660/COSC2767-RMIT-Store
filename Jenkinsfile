@@ -166,12 +166,13 @@ pipeline {
             steps {
                 script {
                     // Run the Ansible playbook
-                    ansiblePlaybook becomeUser: 'ansibleadmin', 
-                                    credentialsId: "${env.ANSIBLE_CREDENTIALS}", 
-                                    installation: 'Ansible', 
-                                    inventory: 'ansible/hosts', 
-                                    playbook: 'ansible/playbooks/PullAndTest.yml',
-                                    disableHostKeyChecking: true
+                    sh """
+                        sudo -u ansibleadmin ansiblePlaybook becomeUser: 'ansibleadmin', 
+                                        credentialsId: "${env.ANSIBLE_CREDENTIALS}", 
+                                        installation: 'Ansible', 
+                                        inventory: 'ansible/hosts', 
+                                        playbook: 'ansible/playbooks/PullAndTest.yml'
+                    """
 
                     // Read and check the exit code
                     def exitCode = readFile('/tmp/test_exit_code.txt').trim()
