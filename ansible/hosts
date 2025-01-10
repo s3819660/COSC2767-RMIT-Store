@@ -1,0 +1,2 @@
+[TestDevServer]
+23.20.223.181 ansible_user=ansibleadmin

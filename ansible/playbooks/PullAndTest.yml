@@ -1,0 +1,28 @@
+---
+- hosts: TestDevServer
+
+  tasks:
+    - name: Start the Docker container
+      command: docker run -d --name fe-container -p 8080:8080 benhuhaudau/fe-rmit-store-client
+
+    - name: Wait for the container to be ready
+      shell: |
+        until docker exec fe-container ls /app; do
+          sleep 2
+        done
+
+    - name: Run npm test inside the container and save output
+      shell: |
+        docker exec fe-container npm test > /tmp/test_output.txt 2>&1
+        echo $? > /tmp/test_exit_code.txt
+
+    - name: Copy test output to control machine
+      fetch:
+        src: /tmp/test_output.txt
+        dest: /tmp/test_output.txt
+        flat: yes
+
+    - name: Stop and remove the container
+      shell: |
+        docker stop fe-container
+        docker rm fe-container
