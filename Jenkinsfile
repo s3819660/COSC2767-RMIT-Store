@@ -3,7 +3,7 @@ pipeline {
 
     tools {
         nodejs "NodeJS"
-        jdk "JDK"
+        jdk "JDK 17"
     }
 
     // identify environment variables
