@@ -123,20 +123,20 @@ pipeline {
                     ''', returnStdout: true).trim()
 
                     // Check if the stack exists
-                    def stackExists = sh(script: '''
-                        aws cloudformation describe-stacks --stack-name TestDevEnv > /dev/null 2>&1 && echo true || echo false
-                    ''', returnStdout: true).trim()
+                    // def stackExists = sh(script: '''
+                    //     aws cloudformation describe-stacks --stack-name TestDevEnv > /dev/null 2>&1 && echo true || echo false
+                    // ''', returnStdout: true).trim()
 
-                    if (stackExists == 'true') {    // delete stack if it exists
-                        sh '''
-                            aws cloudformation delete-stack --stack-name TestDevEnv
-                        '''
-                        // Wait for the stack to be deleted
-                        sh '''
-                            aws cloudformation wait stack-delete-complete \
-                                --stack-name TestDevEnv
-                        '''
-                    }
+                    // if (stackExists == 'true') {    // delete stack if it exists
+                    //     sh '''
+                    //         aws cloudformation delete-stack --stack-name TestDevEnv
+                    //     '''
+                    //     // Wait for the stack to be deleted
+                    //     sh '''
+                    //         aws cloudformation wait stack-delete-complete \
+                    //             --stack-name TestDevEnv
+                    //     '''
+                    // }
 
                     // Create the stack
                     sh """
