@@ -167,11 +167,7 @@ pipeline {
                 script {
                     // Run the Ansible playbook
                     sh """
-                        sudo -u ansibleadmin ansiblePlaybook becomeUser: 'ansibleadmin', 
-                                        credentialsId: "${env.ANSIBLE_CREDENTIALS}", 
-                                        installation: 'Ansible', 
-                                        inventory: 'ansible/hosts', 
-                                        playbook: 'ansible/playbooks/PullAndTest.yml'
+                        sudo -u ansibleadmin ansible-playbook -i ansible/hosts ansible/playbooks/PullAndRunFe.yml
                     """
 
                     // Read and check the exit code
