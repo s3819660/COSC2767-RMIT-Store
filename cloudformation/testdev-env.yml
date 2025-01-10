@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Description: Dev/Test environment with a single EC2 for frontend + backend, and open ports
 
 Parameters:
@@ -19,56 +19,47 @@ Parameters:
     Description: "SSH public key of the user who will access the EC2 instance"
     NoEcho: true
 
+  ElasticIp:
+    Type: String
+    Description: "Elastic IP allocation ID to associate with the EC2 instance"
+
 Resources:
-  DevSecurityGroup:
+  TestDevSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: "Allow inbound for dev/test environment"
       VpcId: !Ref VpcId
       SecurityGroupIngress:
-        # SSH (22)
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
           CidrIp: 0.0.0.0/0
-
-        # HTTP (80)
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
           CidrIp: 0.0.0.0/0
-
-        # HTTPS (443)
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
           CidrIp: 0.0.0.0/0
-
-        # Backend or dev server (3000)
         - IpProtocol: tcp
           FromPort: 3000
           ToPort: 3000
           CidrIp: 0.0.0.0/0
-
-        # Frontend or dev server (8080)
         - IpProtocol: tcp
           FromPort: 8080
           ToPort: 8080
           CidrIp: 0.0.0.0/0
-
-        # MongoDB default port (27017)
         - IpProtocol: tcp
           FromPort: 27017
           ToPort: 27017
           CidrIp: 0.0.0.0/0
-
       SecurityGroupEgress:
         - IpProtocol: -1
           CidrIp: 0.0.0.0/0
-      
       Tags:
         - Key: Name
-          Value: dev-environment-sg
+          Value: test-dev-env-sg
 
   DevEC2Instance:
     Type: AWS::EC2::Instance
@@ -77,44 +68,47 @@ Resources:
       KeyName: !Ref KeyName
       SubnetId: !Ref SubnetId
       SecurityGroupIds:
-        - !GetAtt DevSecurityGroup.GroupId
-      ImageId: ami-01816d07b1128cd2d  # Example Amazon Linux 2 AMI in us-east-1
+        - !GetAtt TestDevSecurityGroup.GroupId
+      ImageId: ami-05576a079321f21f8
       Tags:
         - Key: Name
-          Value: dev-environment-ec2
+          Value: test-dev-env-ec2
       UserData:
         Fn::Base64: !Sub |
-            #!/bin/bash
-            
-            echo "sshpubkey ${SshPubKey}"
+          #!/bin/bash
+          echo "sshpubkey ${SshPubKey}"
+          useradd ansibleadmin
+          echo "ansibleadmin:1234" | chpasswd
+          sudo yum install -y docker
+          sudo systemctl enable docker
+          sudo systemctl start docker
+          usermod -aG docker ansibleadmin
+          echo "ansibleadmin ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+          sudo yum install -y ansible
+          sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+          systemctl restart sshd
+          if [ ! -f /home/ansibleadmin/.ssh/authorized_keys ]; then
+            sudo mkdir -p /home/ansibleadmin/.ssh
+            sudo echo "${SshPubKey}" > /home/ansibleadmin/.ssh/authorized_keys
+          else
+            sudo echo "${SshPubKey}" >> /home/ansibleadmin/.ssh/authorized_keys
+          fi
 
-            useradd ansibleadmin
-            echo "ansibleadmin:rmit" | chpasswd
-            sudo yum install -y docker
-            sudo systemctl enable docker
-            sudo systemctl start docker
-            usermod -aG docker ansibleadmin
-            echo "ansibleadmin ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-            sudo yum install -y ansible
-            sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
-            systemctl restart sshd
-
-            if [ ! -f /home/ansibleadmin/.ssh/authorized_keys ]; then
-              sudo mkdir -p /home/ansibleadmin/.ssh
-              sudo echo "${SshPubKey}" > /home/ansibleadmin/.ssh/authorized_keys
-            else
-              sudo echo "${SshPubKey}" >> /home/ansibleadmin/.ssh/authorized_keys
-            fi
+  DevElasticIPAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      AllocationId: !Ref ElasticIp
+      InstanceId: !Ref DevEC2Instance
 
 Outputs:
   EC2InstanceId:
     Description: "The instance ID of the Dev EC2 1"
     Value: !Ref DevEC2Instance
 
-  EC2PublicIP:
-    Description: "Public IP of the Dev EC2 (if subnet auto-assigns public IP)"
-    Value: !GetAtt DevEC2Instance.PublicIp
+  ElasticIP:
+    Description: "Elastic IP address associated with the Dev EC2"
+    Value: !Ref ElasticIp
 
   SecurityGroupId:
     Description: "The ID of the security group"
-    Value: !GetAtt DevSecurityGroup.GroupId
+    Value: !GetAtt TestDevSecurityGroup.GroupId

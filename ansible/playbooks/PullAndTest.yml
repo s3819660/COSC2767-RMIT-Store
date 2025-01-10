@@ -1,0 +1,29 @@
+---
+- hosts: TestDevServer
+
+  tasks:
+    - name: Start the Docker container
+      command: docker run -d --name fe-container -p 8080:8080 benhuhaudau/fe-rmit-store-client
+
+    - name: Wait for the container to be ready
+      shell: |
+        until docker exec fe-container ls /app; do
+          sleep 2
+        done
+
+    - name: Copy test output to control machine
+      fetch:
+        src: /tmp/test_output.txt
+        dest: /tmp/jenkins/test_output.txt
+        flat: yes
+
+    - name: Copy test exit code to control machine
+      fetch:
+        src: /tmp/test_exit_code.txt
+        dest: /tmp/jenkins/test_exit_code.txt
+        flat: yes
+
+    - name: Stop and remove the container
+      shell: |
+        docker stop fe-container
+        docker rm fe-container
