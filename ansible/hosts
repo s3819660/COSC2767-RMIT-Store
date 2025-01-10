@@ -1,2 +1,2 @@
 [TestDevServer]
-23.20.223.181 ansible_user=ansibleadmin ansible_pass=1234 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+23.20.223.181 ansible_user=ansibleadmin ansible_pass=1234
