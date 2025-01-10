@@ -115,6 +115,9 @@ pipeline {
         steps {
             dir('cloudformation') {
                 script {
+                    // test
+                    echo "AWS Region: ${env.AWS_REGION}"
+
                     def ssh_pub_key = sh(script: '''
                         sudo cat /home/ansibleadmin/.ssh/id_rsa.pub
                     ''', returnStdout: true).trim()
@@ -143,9 +146,10 @@ pipeline {
                             --capabilities CAPABILITY_IAM \
                             --parameter-overrides \
                                 KeyName=devops_project_key \
-                                VpcId=vpc-0d0a77061e27d0a1b \
-                                SubnetId=subnet-095106efd8b1035a6 \
-                                SshPubKey='${ssh_pub_key}'
+                                VpcId=vpc-0b042585e9ec719f9 \
+                                SubnetId=subnet-08996f374a5237f33 \
+                                SshPubKey='${ssh_pub_key}' \
+                                ElasticIp=eipalloc-0352959bcb4bfe70d
                     """
 
                         // Wait for the stack to be created
