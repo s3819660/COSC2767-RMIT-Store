@@ -173,10 +173,10 @@ pipeline {
                                     playbook: 'ansible/playbooks/PullAndTest.yml'
 
                     // Read and check the exit code
-                    def exitCode = readFile('/tmp/test_exit_code.txt').trim()
+                    def exitCode = readFile('/tmp/jenkins/test_exit_code.txt').trim()
                     if (exitCode != '0') {
                         // Display test output due to failure
-                        sh 'cat /tmp/test_output.txt || echo "No test output available."'
+                        sh 'cat /tmp/jenkins/test_output.txt || echo "No test output available."'
                         error "Tests failed with exit code: ${exitCode}"
                     }
 
@@ -184,6 +184,7 @@ pipeline {
                 }
             }
         }
+
     
 
     // post {
