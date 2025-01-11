@@ -170,6 +170,15 @@ pipeline {
                 }
             }
         }
+
+        stage('Pause for EC2 Initialization') {
+            steps {
+                script {
+                    echo 'Pausing for 2 minutes to allow EC2 instance to initialize...'
+                    sleep(time: 1, unit: 'MINUTES') // Adjust time as needed
+                }
+            }
+        }
         
         stage("Test on Remote Server") {
             steps {
