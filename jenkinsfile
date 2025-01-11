@@ -10,8 +10,8 @@ pipeline {
     environment {
         APP_NAME = "rmit-store"
         RELEASE = "1.0.0"
-        DOCKER_USER = "nhan2102"
-        DOCKER_CREDENTIALS = "dockerhub"
+        DOCKER_USER = "benhuhaudau"
+        DOCKER_CREDENTIALS = "dockerhub-credentials"
         ANSIBLE_CREDENTIALS = "ansible"
 
         IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"       // !!!!! should be this form either can not push !!!!!
