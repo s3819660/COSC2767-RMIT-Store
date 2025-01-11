@@ -185,37 +185,47 @@ pipeline {
                     // Extract specific output values
                     def eC2InstanceId = outputs.find { it.OutputKey == "EC2InstanceId" }?.OutputValue
 
-                    sh """
-                        aws ec2 wait instance-status-ok \
-                            --instance-ids ${eC2InstanceId}
-                    """
+                    def isSSHConnectable = false
+                    while (!isSSHConnectable) {
+                        try {
+                            // Attempt to connect via SSH
+                            sh """
+                                ssh -o StrictHostKeyChecking=no -i ${DEVOPS_PROJECT_KEY} ansibleadmin@${ELASTIC_IP} 'echo "SSH connection successful"'
+                            """
+                            isSSHConnectable = true
+                            echo "SSH connection to ${ELASTIC_IP} is successful!"
+                        } catch (Exception e) {
+                            echo "SSH connection to ${ELASTIC_IP} failed. Retrying in 10 seconds..."
+                            sleep(time: 2, unit: 'SECONDS') // Wait for 10 seconds before retrying
+                        }
                     }
                 }
             }
         }
+    }
         
-        stage("Test on Remote Server") {
-            steps {
-                script {
-                    // Run the Ansible playbook
-                    ansiblePlaybook becomeUser: 'ansibleadmin', 
-                                    credentialsId: "${env.ANSIBLE_CREDENTIALS}", 
-                                    installation: 'Ansible', 
-                                    inventory: 'ansible/hosts', 
-                                    playbook: "ansible/playbooks/${PLAYBOOK_FILENAME}"
+    stage("Test on Remote Server") {
+        steps {
+            script {
+                // Run the Ansible playbook
+                ansiblePlaybook becomeUser: 'ansibleadmin', 
+                                credentialsId: "${env.ANSIBLE_CREDENTIALS}", 
+                                installation: 'Ansible', 
+                                inventory: 'ansible/hosts', 
+                                playbook: "ansible/playbooks/${PLAYBOOK_FILENAME}"
 
-                    // Read and check the exit code
-                    def exitCode = readFile('/tmp/jenkins/test_exit_code.txt').trim()
-                    if (exitCode != '0') {
-                        // Display test output due to failure
-                        sh 'cat /tmp/jenkins/test_output.txt || echo "No test output available."'
-                        error "Tests failed with exit code: ${exitCode}"
-                    }
-
-                    echo "Tests passed successfully."
+                // Read and check the exit code
+                def exitCode = readFile('/tmp/jenkins/test_exit_code.txt').trim()
+                if (exitCode != '0') {
+                    // Display test output due to failure
+                    sh 'cat /tmp/jenkins/test_output.txt || echo "No test output available."'
+                    error "Tests failed with exit code: ${exitCode}"
                 }
+
+                echo "Tests passed successfully."
             }
         }
+    }
 
     
 
