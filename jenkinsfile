@@ -26,6 +26,12 @@ pipeline {
         ELASTIC_IP = "eipalloc-00e23129030d57310"
         GIT_BRANCH = "phuc/nhan-test-server"
         REPO_URL = "https://github.com/s3819660/COSC2767-RMIT-Store.git"
+
+        DEVOPS_PROJECT_KEY = "devops_project_key_other_account"
+        // VPC_ID = "vpc-0b042585e9ec719f9"
+        VPC_ID = "vpc-087ade8aa993e0b95"
+        // SUBNET_ID = "subnet-08996f374a5237f33"
+        SUBNET_ID = "subnet-0b1d2b67dccb76fb1"
     }
 
     stages {
@@ -149,9 +155,9 @@ pipeline {
                             --stack-name TestDevEnv \
                             --capabilities CAPABILITY_IAM \
                             --parameter-overrides \
-                                KeyName=devops_project_key \
-                                VpcId=vpc-0b042585e9ec719f9 \
-                                SubnetId=subnet-08996f374a5237f33 \
+                                KeyName='${DEVOPS_PROJECT_KEY}' \
+                                VpcId=${VPC_ID} \
+                                SubnetId=${SUBNET_ID} \
                                 SshPubKey='${ssh_pub_key}' \
                                 ElasticIp='${ELASTIC_IP}'
                     """
