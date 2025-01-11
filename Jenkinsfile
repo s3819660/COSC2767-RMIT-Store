@@ -222,17 +222,17 @@ pipeline {
                             --region ${env.AWS_REGION} \
                             --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
                             --parameter-overrides \
-                                KeyName=${.KEY_NAME} \
-                                ImageIdFrontEnd=${.IMAGE_ID_FRONTEND} \
-                                ImageIdBackEnd=${.IMAGE_ID_BACKEND} \
+                                KeyName=${env.KEY_NAME} \
+                                ImageIdFrontEnd=${env.IMAGE_ID_FRONTEND} \
+                                ImageIdBackEnd=${env.IMAGE_ID_BACKEND} \
                                 VpcCidr=${VPC_CIDR} \
                                 PublicSubnet1Cidr=${PUBLIC_SUBNET1_CIDR} \
                                 PublicSubnet2Cidr=${PUBLIC_SUBNET2_CIDR} \
-                                TrustedSSHCIDR=${.TRUSTED_SSH_CIDR} \
+                                TrustedSSHCIDR=${env.TRUSTED_SSH_CIDR} \
                                 SwarmMasterToken=${SWARM_MASTER_TOKEN} \
                                 SwarmMasterIP=${SWARM_MASTER_IP} \
-                                Hostname-FE=${.HOSTNAME_FE} \
-                                Hostname-BE=${.HOSTNAME_BE}
+                                Hostname-FE=${env.HOSTNAME_FE} \
+                                Hostname-BE=${env.HOSTNAME_BE}
                     """
 
                     // Wait for stack to be fully deployed
@@ -270,8 +270,8 @@ pipeline {
             steps {
                 script {
                     // assign node labels
-                    sh "docker node update --label-add role=client ${.HOSTNAME_FE}"
-                    sh "docker node update --label-add role=server ${.HOSTNAME_BE}"
+                    sh "docker node update --label-add role=client ${env.HOSTNAME_FE}"
+                    sh "docker node update --label-add role=server ${env.HOSTNAME_BE}"
 
                     // deploy the stack
                     sh "docker stack deploy -c docker-compose.yml ${DP_STACK_NAME}"
