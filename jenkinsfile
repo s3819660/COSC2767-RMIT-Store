@@ -190,12 +190,12 @@ pipeline {
                         try {
                             // Attempt to connect via SSH
                             sh """
-                                ssh -o StrictHostKeyChecking=no -i ${DEVOPS_PROJECT_KEY} ansibleadmin@${ELASTIC_IP} 'echo "SSH connection successful"'
+                                sshpass -p 'rmit' ssh -o StrictHostKeyChecking=no ansibleadmin@${ELASTIC_IP} 'echo "SSH connection successful"'
                             """
                             isSSHConnectable = true
                             echo "SSH connection to ${ELASTIC_IP} is successful!"
                         } catch (Exception e) {
-                            echo "SSH connection to ${ELASTIC_IP} failed. Retrying in 10 seconds..."
+                            echo "SSH connection to ${ELASTIC_IP} failed. Retrying in 2 seconds..."
                             sleep(time: 2, unit: 'SECONDS') // Wait for 10 seconds before retrying
                         }
                     }
