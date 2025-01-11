@@ -172,33 +172,7 @@ pipeline {
                             --stack-name ${STACK_NAME}
                     """
 
-                    // Retrieve the stack outputs
-                    def stackOutputs = sh(script: '''
-                        aws cloudformation describe-stacks \
-                            --stack-name MyDevEnv \
-                            --query "Stacks[0].Outputs"
-                    ''', returnStdout: true).trim()
-
-                    // Parse the outputs to extract values
-                    def outputs = readJSON text: stackOutputs
-
-                    // Extract specific output values
-                    def eC2InstanceId = outputs.find { it.OutputKey == "EC2InstanceId" }?.OutputValue
-
-                    def isSSHConnectable = false
-                    while (!isSSHConnectable) {
-                        try {
-                            // Attempt to connect via SSH
-                            sh """
-                                sshpass -p 'rmit' ssh -o StrictHostKeyChecking=no ansibleadmin@${ELASTIC_IP} 'echo "SSH connection successful"'
-                            """
-                            isSSHConnectable = true
-                            echo "SSH connection to ${ELASTIC_IP} is successful!"
-                        } catch (Exception e) {
-                            echo "SSH connection to ${ELASTIC_IP} failed. Retrying in 2 seconds..."
-                            sleep(time: 2, unit: 'SECONDS') // Wait for 10 seconds before retrying
-                        }
-                    }
+                    sleep(time: 10, unit: 'SECONDS')
                 }
             }
         }
