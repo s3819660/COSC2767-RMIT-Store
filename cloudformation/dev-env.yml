@@ -19,7 +19,7 @@ Parameters:
     Description: "SSH public key of the user who will access the EC2 instance"
     NoEcho: true
 
-  ElasticIp:
+  ElasticIpId:
     Type: String
     Description: "Elastic IP allocation ID to associate with the EC2 instance"
 
