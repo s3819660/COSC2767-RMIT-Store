@@ -1,2 +1,2 @@
 [TestDevServer]
-54.156.23.27 ansible_user=ansibleadmin ansible_pass=rmit
+54.156.23.27 ansible_user=ansibleadmin ansible_pass=1234
