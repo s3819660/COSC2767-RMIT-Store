@@ -8,17 +8,17 @@ pipeline {
 
     // identify dynamic variables
     parameters {
-        GITHUB_URL = "https://github.com/s3819660/COSC2767-RMIT-Store.git"
-        GIT_BRANCH = "nhan-test"
-        KEY_NAME = "devops_project_key"
-        VPC_ID_DEV = "vpc-0b042585e9ec719f9"
-        SUBNET_ID_DEV = "subnet-08996f374a5237f33"
-        ELASTIC_ID_DEV = "eipalloc-0352959bcb4bfe70d"
-        IMAGE_ID_FRONTEND = "ami-05576a079321f21f8"
-        IMAGE_ID_BACKEND = "ami-05576a079321f21f8"
-        TRUSTED_SSH_CIDR = "0.0.0.0/0" // CIDR block for SSH access to EC2 instances
-        HOSTNAME_FE = "worker-client"
-        HOSTNAME_BE = "worker-server" // Hostname of the backend server
+        string(name: 'GITHUB_URL', defaultValue: "${GITHUB_URL ?: 'https://github.com/s3819660/COSC2767-RMIT-Store.git'}")
+        string(name: 'GIT_BRANCH', defaultValue: "${GIT_BRANCH ?: 'nhan-test'}")
+        string(name: 'KEY_NAME', defaultValue: "${KEY_NAME ?: 'devops_project_key'}")
+        string(name: 'VPC_ID_DEV', defaultValue: "${VPC_ID_DEV ?: 'vpc-0b042585e9ec719f9'}")
+        string(name: 'SUBNET_ID_DEV', defaultValue: "${SUBNET_ID_DEV ?: 'subnet-08996f374a5237f33'}")
+        string(name: 'ELASTIC_ID_DEV', defaultValue: "${ELASTIC_ID_DEV ?: 'eipalloc-0352959bcb4bfe70d'}")
+        string(name: 'IMAGE_ID_FRONTEND', defaultValue: "${IMAGE_ID_FRONTEND ?: 'ami-05576a079321f21f8'}")
+        string(name: 'IMAGE_ID_BACKEND', defaultValue: "${IMAGE_ID_BACKEND ?: 'ami-05576a079321f21f8'}")
+        string(name: 'TRUSTED_SSH_CIDR', defaultValue: "${TRUSTED_SSH_CIDR ?: '0.0.0.0/0'}", description: 'CIDR block for SSH access to EC2 instances')
+        string(name: 'HOSTNAME_FE', defaultValue: "${HOSTNAME_FE ?: 'worker-client'}")
+        string(name: 'HOSTNAME_BE', defaultValue: "${HOSTNAME_BE ?: 'worker-server'}", description: 'Hostname of the backend server')
     }
 
     // identify environment variables
