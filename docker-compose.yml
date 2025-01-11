@@ -1,0 +1,21 @@
+services:
+  client:
+    image: ${IMAGE_NAME}-client:latest
+    ports:
+      - "8080:8080"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.role == client
+
+
+  server:
+    image: ${IMAGE_NAME}-server:latest
+    ports:
+      - "3000:3000"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.role == server
