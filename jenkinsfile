@@ -32,6 +32,9 @@ pipeline {
         VPC_ID = "vpc-087ade8aa993e0b95"
         // SUBNET_ID = "subnet-08996f374a5237f33"
         SUBNET_ID = "subnet-0b1d2b67dccb76fb1"
+        STACK_NAME = "TestDevEnv"
+        TEMPLATE_FILENAME = "testdev-env.yml"
+        PLAYBOOK_FILENAME = "PullAndTest.yml"
     }
 
     stages {
@@ -151,8 +154,8 @@ pipeline {
                     // Create the stack
                     sh """
                         aws cloudformation deploy \
-                            --template-file testdev-env.yml \
-                            --stack-name TestDevEnv \
+                            --template-file ${TEMPLATE_FILENAME} \
+                            --stack-name ${STACK_NAME} \
                             --capabilities CAPABILITY_IAM \
                             --parameter-overrides \
                                 KeyName='${DEVOPS_PROJECT_KEY}' \
@@ -200,7 +203,7 @@ pipeline {
                                     credentialsId: "${env.ANSIBLE_CREDENTIALS}", 
                                     installation: 'Ansible', 
                                     inventory: 'ansible/hosts', 
-                                    playbook: 'ansible/playbooks/PullAndTest.yml'
+                                    playbook: "ansible/playbooks/${PLAYBOOK_FILENAME}"
 
                     // Read and check the exit code
                     def exitCode = readFile('/tmp/jenkins/test_exit_code.txt').trim()
