@@ -166,17 +166,17 @@ pipeline {
                     """
 
                     // Wait for the stack to be created
-                    sh '''
+                    sh """
                         aws cloudformation wait stack-create-complete \
-                            --stack-name TestDevEnv
-                    '''
+                            --stack-name ${STACK_NAME}
+                    """
 
                     // Retrieve the stack outputs
-                    def stackOutputs = sh(script: '''
+                    def stackOutputs = sh(script: """
                         aws cloudformation describe-stacks \
-                            --stack-name MyDevEnv \
+                            --stack-name ${STACK_NAME} \
                             --query "Stacks[0].Outputs"
-                    ''', returnStdout: true).trim()
+                    """, returnStdout: true).trim()
 
                     // Parse the outputs to extract values
                     def outputs = readJSON text: stackOutputs
