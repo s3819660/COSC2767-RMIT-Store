@@ -47,7 +47,7 @@ pipeline {
         // checkout code from source code
         stage("Checkout from SCM"){ 
             steps {
-                git branch: ${GIT_BRANCH}, url: ${REPO_URL}
+                git branch: "${GIT_BRANCH}", url: "${REPO_URL}"
             }
         }
 
