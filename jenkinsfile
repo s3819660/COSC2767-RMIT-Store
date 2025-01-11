@@ -22,6 +22,10 @@ pipeline {
 
         AWS_REGION = "us-east-1"
         SNS_TOPIC_ARN = "arn:aws:sns:us-east-1:975050071897:test-topic"
+        // ELASTIC_IP = "eipalloc-0352959bcb4bfe70d"
+        ELASTIC_IP = "eipalloc-00e23129030d57310"
+        GIT_BRANCH = "phuc/nhan-test-server"
+        REPO_URL = "https://github.com/s3819660/COSC2767-RMIT-Store.git"
     }
 
     stages {
@@ -43,7 +47,7 @@ pipeline {
         // checkout code from source code
         stage("Checkout from SCM"){ 
             steps {
-                git branch: "refactor", url: "https://github.com/NhanNguyen20/COSC2767-RMIT-Store.git"
+                git branch: ${GIT_BRANCH}, url: ${REPO_URL}
             }
         }
 
@@ -149,14 +153,34 @@ pipeline {
                                 VpcId=vpc-0b042585e9ec719f9 \
                                 SubnetId=subnet-08996f374a5237f33 \
                                 SshPubKey='${ssh_pub_key}' \
-                                ElasticIp=eipalloc-0352959bcb4bfe70d
+                                ElasticIp='${ELASTIC_IP}'
                     """
 
-                        // Wait for the stack to be created
+                    // Wait for the stack to be created
                     sh '''
                         aws cloudformation wait stack-create-complete \
                             --stack-name TestDevEnv
                     '''
+
+                    // Retrieve the stack outputs
+                    def stackOutputs = sh(script: '''
+                        aws cloudformation describe-stacks \
+                            --stack-name MyDevEnv \
+                            --query "Stacks[0].Outputs"
+                    ''', returnStdout: true).trim()
+
+                    // Parse the outputs to extract values
+                    def outputs = readJSON text: stackOutputs
+
+                    // Extract specific output values
+                    def ec2PublicIp = outputs.find { it.OutputKey == "EC2PublicIP" }?.OutputValue
+                    // Store the values in environment variables for use in subsequent stages
+                    env.EC2_PUBLIC_IP = ec2PublicIp
+
+                    sh """
+                        aws ec2 wait instance-status-ok \
+                            --instance-ids ${env.EC2_PUBLIC_IP}
+                    """
                     }
                 }
             }
