@@ -215,7 +215,7 @@ pipeline {
 
                     def SWARM_MASTER_TOKEN = sh(script: "docker swarm join-token manager -q", returnStdout: true).trim()
 
-                    def SWARM_MASTER_IP = sh(script: "hostname -I | awk '{print $1}'", returnStdout: true).trim()
+                    def SWARM_MASTER_IP = sh(script: "hostname -I | awk '{print \$1}'", returnStdout: true).trim()
 
                     // Deploy or update the CloudFormation stack
                     sh """
