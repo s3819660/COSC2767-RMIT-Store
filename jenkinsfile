@@ -6,6 +6,21 @@ pipeline {
         jdk "JDK 17"
     }
 
+    // identify dynamic variables
+    parameters {
+        GITHUB_URL = "https://github.com/s3819660/COSC2767-RMIT-Store.git"
+        GIT_BRANCH = "nhan-test"
+        KEY_NAME = "devops_project_key"
+        VPC_ID_DEV = "vpc-0b042585e9ec719f9"
+        SUBNET_ID_DEV = "subnet-08996f374a5237f33"
+        ELASTIC_ID_DEV = "eipalloc-0352959bcb4bfe70d"
+        IMAGE_ID_FRONTEND = "ami-05576a079321f21f8"
+        IMAGE_ID_BACKEND = "ami-05576a079321f21f8"
+        TRUSTED_SSH_CIDR = "0.0.0.0/0" // CIDR block for SSH access to EC2 instances
+        HOSTNAME_FE = "worker-client"
+        HOSTNAME_BE = "worker-server" // Hostname of the backend server
+    }
+
     // identify environment variables
     environment {
         APP_NAME = "rmit-store"
@@ -22,6 +37,10 @@ pipeline {
 
         AWS_REGION = "us-east-1"
         SNS_TOPIC_ARN = "arn:aws:sns:us-east-1:975050071897:test-topic"
+
+        VPC_CIDR = '10.0.0.0/16'
+        PUBLIC_SUBNET1_CIDR = '10.0.1.0/24'
+        PUBLIC_SUBNET2_CIDR = '10.0.2.0/24'
     }
 
     stages {
@@ -43,7 +62,7 @@ pipeline {
         // checkout code from source code
         stage("Checkout from SCM"){ 
             steps {
-                git branch: "refactor", url: "https://github.com/NhanNguyen20/COSC2767-RMIT-Store.git"
+                git branch: "${params.GIT_BRANCH}", url: "${params.GITHUB_URL}"
             }
         }
 
@@ -57,11 +76,11 @@ pipeline {
                                 npm install
                                 npm test
                             """
-                        }   
+                        }
                     }
                 )
             }
-        } 
+        }
 
         // create Docker image -> push to Docker Hub -> pull back to build image
         stage("Build & Push Docker images") {
@@ -102,61 +121,54 @@ pipeline {
             }
         }
 
-        stage("Deploy to Swarm") {
+         */
+
+        stage('CloudFormation Deploy Dev Environment') {
             steps {
-                script {
-                    sh "docker stack deploy -c docker-compose.yml ${DP_STACK_NAME}"
-                }
-            }
-        }
-    } */
+                dir('cloudformation') {
+                    script {
+                        // test
+                        echo "AWS Region: ${env.AWS_REGION}"
 
-    stage('CloudFormation Deploy') {
-        steps {
-            dir('cloudformation') {
-                script {
-                    // test
-                    echo "AWS Region: ${env.AWS_REGION}"
+                        def ssh_pub_key = sh(script: '''
+                            sudo cat /home/ansibleadmin/.ssh/id_rsa.pub
+                        ''', returnStdout: true).trim()
 
-                    def ssh_pub_key = sh(script: '''
-                        sudo cat /home/ansibleadmin/.ssh/id_rsa.pub
-                    ''', returnStdout: true).trim()
+                        // Check if the stack exists
+                        // def stackExists = sh(script: '''
+                        //     aws cloudformation describe-stacks --stack-name TestDevEnv > /dev/null 2>&1 && echo true || echo false
+                        // ''', returnStdout: true).trim()
 
-                    // Check if the stack exists
-                    // def stackExists = sh(script: '''
-                    //     aws cloudformation describe-stacks --stack-name TestDevEnv > /dev/null 2>&1 && echo true || echo false
-                    // ''', returnStdout: true).trim()
+                        // if (stackExists == 'true') {    // delete stack if it exists
+                        //     sh '''
+                        //         aws cloudformation delete-stack --stack-name TestDevEnv
+                        //     '''
+                        //     // Wait for the stack to be deleted
+                        //     sh '''
+                        //         aws cloudformation wait stack-delete-complete \
+                        //             --stack-name DevEnv
+                        //     '''
+                        // }
 
-                    // if (stackExists == 'true') {    // delete stack if it exists
-                    //     sh '''
-                    //         aws cloudformation delete-stack --stack-name TestDevEnv
-                    //     '''
-                    //     // Wait for the stack to be deleted
-                    //     sh '''
-                    //         aws cloudformation wait stack-delete-complete \
-                    //             --stack-name TestDevEnv
-                    //     '''
-                    // }
+                        // Create the stack
+                        sh """
+                            aws cloudformation deploy \
+                                --template-file dev-env.yml \
+                                --stack-name DevEnv \
+                                --capabilities CAPABILITY_IAM \
+                                --parameter-overrides \
+                                    KeyName=${params.KEY_NAME} \
+                                    VpcId=${params.VPC_ID_DEV} \
+                                    SubnetId=${params.SUBNET_ID_DEV} \
+                                    SshPubKey='${ssh_pub_key}' \
+                                    ElasticIpId=${params.ELASTIC_ID_DEV}
+                        """
 
-                    // Create the stack
-                    sh """
-                        aws cloudformation deploy \
-                            --template-file testdev-env.yml \
-                            --stack-name TestDevEnv \
-                            --capabilities CAPABILITY_IAM \
-                            --parameter-overrides \
-                                KeyName=devops_project_key \
-                                VpcId=vpc-0b042585e9ec719f9 \
-                                SubnetId=subnet-08996f374a5237f33 \
-                                SshPubKey='${ssh_pub_key}' \
-                                ElasticIp=eipalloc-0352959bcb4bfe70d
-                    """
-
-                        // Wait for the stack to be created
-                    sh '''
-                        aws cloudformation wait stack-create-complete \
-                            --stack-name TestDevEnv
-                    '''
+                            // Wait for the stack to be created
+                        sh '''
+                            aws cloudformation wait stack-create-complete \
+                                --stack-name DevEnv
+                        '''
                     }
                 }
             }
@@ -185,19 +197,105 @@ pipeline {
             }
         }
 
-    
+        stage('CloudFormation Deploy Production Stack') {
+            steps {
+                script {
+                    // Optionally, fetch the latest AMI IDs using AWS SSM Parameter Store
+                    /*
+                    IMAGE_ID_FRONTEND = sh (
+                        script: "aws ssm get-parameters --names /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2 --region ${REGION} --query 'Parameters[0].Value' --output text",
+                        returnStdout: true
+                    ).trim()
 
-    // post {
-    //     failure {
-    //         script {
-    //             sh """
-    //             aws sns publish \
-    //               --region $AWS_REGION \
-    //               --topic-arn $SNS_TOPIC_ARN \
-    //               --message "Build Failed: Job ${env.JOB_NAME} #${env.BUILD_NUMBER}" \
-    //               --subject "Jenkins Build FAILURE"
-    //             """
-    //         }
-    //     }
+                    IMAGE_ID_BACKEND = sh (
+                        script: "aws ssm get-parameters --names /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2 --region ${REGION} --query 'Parameters[0].Value' --output text",
+                        returnStdout: true
+                    ).trim()
+                    */
+
+                    def SWARM_MASTER_TOKEN = sh(script: "docker swarm join-token manager -q", returnStdout: true).trim()
+
+                    def SWARM_MASTER_IP = sh(script: "hostname -I | awk '{print $1}'", returnStdout: true).trim()
+
+                    // Deploy or update the CloudFormation stack
+                    sh """
+                        aws cloudformation deploy \
+                            --template-file prod-env.yml \
+                            --stack-name ProdEnv \
+                            --region ${env.AWS_REGION} \
+                            --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
+                            --parameter-overrides \
+                                KeyName=${params.KEY_NAME} \
+                                ImageIdFrontEnd=${params.IMAGE_ID_FRONTEND} \
+                                ImageIdBackEnd=${params.IMAGE_ID_BACKEND} \
+                                VpcCidr=${VPC_CIDR} \
+                                PublicSubnet1Cidr=${PUBLIC_SUBNET1_CIDR} \
+                                PublicSubnet2Cidr=${PUBLIC_SUBNET2_CIDR} \
+                                TrustedSSHCIDR=${params.TRUSTED_SSH_CIDR} \
+                                SwarmMasterToken=${SWARM_MASTER_TOKEN} \
+                                SwarmMasterIP=${SWARM_MASTER_IP} \
+                                Hostname-FE=${params.HOSTNAME_FE} \
+                                Hostname-BE=${params.HOSTNAME_BE}
+                    """
+
+                    // Wait for stack to be fully deployed
+                    sh """
+                        aws cloudformation wait stack-update-complete --stack-name ${STACK_NAME} --region ${REGION}
+                    """
+
+                    // Retrieve stack outputs and set them as environment variables
+                    def stackOutputs = sh (
+                        script: "aws cloudformation describe-stacks --stack-name ${STACK_NAME} --region ${REGION} --query 'Stacks[0].Outputs' --output json",
+                        returnStdout: true
+                    ).trim()
+
+                    def outputs = readJSON text: stackOutputs
+
+                    // Extract specific outputs
+                    def loadBalancerDNS = outputs.find { it.OutputKey == 'LoadBalancerDNS' }?.OutputValue
+                    def frontEndASGName = outputs.find { it.OutputKey == 'FrontEndAutoScalingGroupName' }?.OutputValue
+                    def backEndASGName = outputs.find { it.OutputKey == 'BackEndAutoScalingGroupName' }?.OutputValue
+
+                    // Set environment variables for subsequent stages
+                    env.LOAD_BALANCER_DNS = loadBalancerDNS
+                    env.FRONT_END_ASG_NAME = frontEndASGName
+                    env.BACK_END_ASG_NAME = backEndASGName
+
+                    // (Optional) Echo the outputs
+                    echo "Load Balancer DNS: ${env.LOAD_BALANCER_DNS}"
+                    echo "Front-End ASG Name: ${env.FRONT_END_ASG_NAME}"
+                    echo "Back-End ASG Name: ${env.BACK_END_ASG_NAME}"
+                }
+            }
+        }
+
+        stage("Deploy to Swarm") {
+            steps {
+                script {
+                    // assign node labels
+                    sh "docker node update --label-add role=client ${params.HOSTNAME_FE}"
+                    sh "docker node update --label-add role=server ${params.HOSTNAME_BE}"
+
+                    // deploy the stack
+                    sh "docker stack deploy -c docker-compose.yml ${DP_STACK_NAME}"
+                }
+            }
+        }
+
+/* 
+    post {
+        failure {
+            script {
+                sh """
+                aws sns publish \
+                  --region $AWS_REGION \
+                  --topic-arn $SNS_TOPIC_ARN \
+                  --message "Build Failed: Job ${env.JOB_NAME} #${env.BUILD_NUMBER}" \
+                  --subject "Jenkins Build FAILURE"
+                """
+            }
+        }
+    }
+*/
     }
 }

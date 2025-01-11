@@ -24,7 +24,7 @@ Parameters:
     Description: "Elastic IP allocation ID to associate with the EC2 instance"
 
 Resources:
-  TestDevSecurityGroup:
+  DevSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: "Allow inbound for dev/test environment"
@@ -59,7 +59,7 @@ Resources:
           CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
-          Value: test-dev-env-sg
+          Value: dev-env-sg
 
   DevEC2Instance:
     Type: AWS::EC2::Instance
@@ -68,11 +68,11 @@ Resources:
       KeyName: !Ref KeyName
       SubnetId: !Ref SubnetId
       SecurityGroupIds:
-        - !GetAtt TestDevSecurityGroup.GroupId
+        - !GetAtt DevSecurityGroup.GroupId
       ImageId: ami-05576a079321f21f8
       Tags:
         - Key: Name
-          Value: test-dev-env-ec2
+          Value: dev-env-ec2
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
@@ -111,4 +111,4 @@ Outputs:
 
   SecurityGroupId:
     Description: "The ID of the security group"
-    Value: !GetAtt TestDevSecurityGroup.GroupId
+    Value: !GetAtt DevSecurityGroup.GroupId
