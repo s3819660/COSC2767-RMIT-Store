@@ -19,7 +19,7 @@ Parameters:
     Description: "SSH public key of the user who will access the EC2 instance"
     NoEcho: true
 
-  ElasticIp:
+  ElasticId:
     Type: String
     Description: "Elastic IP allocation ID to associate with the EC2 instance"
 
@@ -97,7 +97,7 @@ Resources:
   DevElasticIPAssociation:
     Type: AWS::EC2::EIPAssociation
     Properties:
-      AllocationId: !Ref ElasticIp
+      AllocationId: !Ref ElasticId
       InstanceId: !Ref DevEC2Instance
 
 Outputs:
@@ -105,9 +105,9 @@ Outputs:
     Description: "The instance ID of the Dev EC2 1"
     Value: !Ref DevEC2Instance
 
-  ElasticIP:
-    Description: "Elastic IP address associated with the Dev EC2"
-    Value: !Ref ElasticIp
+  ElasticId:
+    Description: "Elastic IP ID"
+    Value: !Ref ElasticId
 
   SecurityGroupId:
     Description: "The ID of the security group"

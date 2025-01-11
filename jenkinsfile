@@ -22,8 +22,9 @@ pipeline {
 
         AWS_REGION = "us-east-1"
         SNS_TOPIC_ARN = "arn:aws:sns:us-east-1:975050071897:test-topic"
-        // ELASTIC_IP = "eipalloc-0352959bcb4bfe70d"
-        ELASTIC_IP = "eipalloc-00e23129030d57310"
+        // ELASTIC_ID = "eipalloc-0352959bcb4bfe70d"
+        ELASTIC_ID = "eipalloc-00e23129030d57310"
+        ELASTIC_IP = "54.156.23.27"
         GIT_BRANCH = "phuc/nhan-test-server"
         REPO_URL = "https://github.com/s3819660/COSC2767-RMIT-Store.git"
 
@@ -162,7 +163,7 @@ pipeline {
                                 VpcId=${VPC_ID} \
                                 SubnetId=${SUBNET_ID} \
                                 SshPubKey='${ssh_pub_key}' \
-                                ElasticIp='${ELASTIC_IP}'
+                                ElasticId='${ELASTIC_ID}'
                     """
 
                     // Wait for the stack to be created
@@ -172,23 +173,21 @@ pipeline {
                     """
 
                     // Retrieve the stack outputs
-                    def stackOutputs = sh(script: """
+                    def stackOutputs = sh(script: '''
                         aws cloudformation describe-stacks \
-                            --stack-name ${STACK_NAME} \
+                            --stack-name MyDevEnv \
                             --query "Stacks[0].Outputs"
-                    """, returnStdout: true).trim()
+                    ''', returnStdout: true).trim()
 
                     // Parse the outputs to extract values
                     def outputs = readJSON text: stackOutputs
 
                     // Extract specific output values
-                    def ec2PublicIp = outputs.find { it.OutputKey == "EC2PublicIP" }?.OutputValue
-                    // Store the values in environment variables for use in subsequent stages
-                    env.EC2_PUBLIC_IP = ec2PublicIp
+                    def eC2InstanceId = outputs.find { it.OutputKey == "EC2InstanceId" }?.OutputValue
 
                     sh """
                         aws ec2 wait instance-status-ok \
-                            --instance-ids ${env.EC2_PUBLIC_IP}
+                            --instance-ids ${eC2InstanceId}
                     """
                     }
                 }
