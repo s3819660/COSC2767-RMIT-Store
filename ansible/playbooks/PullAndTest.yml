@@ -2,6 +2,9 @@
 - hosts: TestDevServer
 
   tasks:
+    - name: Kill all
+      command: docker kill $(docker ps -q)
+
     - name: Remove all containers
       command: docker rm -f $(docker ps -a -q)
 
