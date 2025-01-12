@@ -251,8 +251,8 @@ pipeline {
                                 TrustedSSHCIDR=${env.TRUSTED_SSH_CIDR} \
                                 SwarmMasterToken=${SWARM_MASTER_TOKEN} \
                                 SwarmMasterIP=${SWARM_MASTER_IP} \
-                                Hostname-FE=${env.HOSTNAME_FE} \
-                                Hostname-BE=${env.HOSTNAME_BE}
+                                HostnameFE=${env.HOSTNAME_FE} \
+                                HostnameBE=${env.HOSTNAME_BE}
                     """
 
                     // Wait for stack to be fully deployed
