@@ -44,8 +44,13 @@
           sleep 2
         done
 
+    - name: Source bashrc
+      shell: |
+        source ~/.bashrc
+      become: yes
+
     - name: Install Test Dependencies
-      command: sudo source ~/.bashrc && npm install && dnf install -y xorg-x11-server-Xvfb gtk3-devel nss alsa-lib
+      command: npm install && dnf install -y xorg-x11-server-Xvfb gtk3-devel nss alsa-lib
       args:
         chdir: /home/ansibleadmin/COSC2767-RMIT-Store
 
