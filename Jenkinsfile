@@ -237,6 +237,8 @@ pipeline {
 
                     def SWARM_MASTER_IP = sh(script: "hostname -I | awk '{print \$1}'", returnStdout: true).trim()
 
+                    echo "Swarm Master Token: ${SWARM_MASTER_TOKEN} | Swarm Master IP: ${SWARM_MASTER_IP}"
+
                     // Deploy or update the CloudFormation stack
                     sh """
                         aws cloudformation deploy \
