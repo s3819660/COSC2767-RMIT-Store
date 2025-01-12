@@ -255,9 +255,9 @@ pipeline {
                     """
 
                     // Wait for stack to be fully deployed
-                    sh """
-                        aws cloudformation wait stack-update-complete --stack-name ProdEnv --region ${env.AWS_REGION}
-                    """
+                    // sh """
+                    //     aws cloudformation wait stack-update-complete --stack-name ProdEnv
+                    // """
 
                     // Retrieve stack outputs and set them as environment variables
                     // def stackOutputs = sh (
