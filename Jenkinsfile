@@ -236,7 +236,7 @@ pipeline {
                     // Deploy or update the CloudFormation stack
                     sh """
                         aws cloudformation deploy \
-                            --template-file prod-env.yml \
+                            --template-file cloudformation/prod-env.yml \
                             --stack-name ProdEnv \
                             --region ${env.AWS_REGION} \
                             --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
