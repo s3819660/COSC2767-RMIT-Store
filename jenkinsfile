@@ -25,7 +25,7 @@ pipeline {
         // ELASTIC_ID = "eipalloc-0352959bcb4bfe70d"
         ELASTIC_ID = "eipalloc-00e23129030d57310"
         ELASTIC_IP = "54.156.23.27"
-        GIT_BRANCH = "phuc/nhan-test-server"
+        GIT_BRANCH = "phuc/integrate_with_test"
         REPO_URL = "https://github.com/s3819660/COSC2767-RMIT-Store.git"
 
         DEVOPS_PROJECT_KEY = "devops_project_key_other_account"
@@ -180,7 +180,6 @@ pipeline {
     stage("Ping Remote Server") {
         steps {
             script {
-                // Run the Ansible playbook
                 ansiblePlaybook becomeUser: 'ansibleadmin', 
                                 credentialsId: "${env.ANSIBLE_CREDENTIALS}", 
                                 installation: 'Ansible', 
