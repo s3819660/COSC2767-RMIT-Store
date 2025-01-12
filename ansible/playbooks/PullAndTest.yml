@@ -44,10 +44,15 @@
           sleep 2
         done
 
+    - name: Install Test Dependencies
+      command: npm install && dnf install -y xorg-x11-server-Xvfb gtk3-devel nss alsa-lib
+      args:
+        chdir: /home/ansibleadmin/COSC2767-RMIT-Store
+
     - name: Run Web UI Test
       command: npx cypress run
       args:
-        chdir: ./COSC2767-RMIT-Store
+        chdir: /home/ansibleadmin/COSC2767-RMIT-Store
     # - name: Copy test output to control machine
     #   fetch:
     #     src: /tmp/test_output.txt
