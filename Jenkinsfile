@@ -280,7 +280,7 @@ pipeline {
         stage('Pause for EC2 Initialization') {
             steps {
                 script {
-                    sleep(time: 2, unit: 'MINUTES')
+                    sleep(time: 1, unit: 'MINUTES')
                 }
             }
         }

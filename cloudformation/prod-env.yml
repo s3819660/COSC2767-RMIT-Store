@@ -162,6 +162,10 @@ Resources:
           FromPort: 7946
           ToPort: 7946
           CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 42827
+          ToPort: 42827
+          CidrIp: 0.0.0.0/0
         - IpProtocol: udp
           FromPort: 7946
           ToPort: 7946
@@ -212,6 +216,10 @@ Resources:
           FromPort: 4789
           ToPort: 4789
           CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 42827
+          ToPort: 42827
+          CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
         - IpProtocol: -1
           CidrIp: 0.0.0.0/0
@@ -257,6 +265,10 @@ Resources:
         - IpProtocol: udp
           FromPort: 4789
           ToPort: 4789
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 42827
+          ToPort: 42827
           CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
         - IpProtocol: -1
