@@ -40,8 +40,8 @@ pipeline {
         HOSTNAME_FE = "worker-client"
         HOSTNAME_BE = "worker-server" // Hostname of the backend server
 
-        SWARM_MASTER_TOKEN
-        SWARM_MASTER_IP
+        SWARM_MASTER_TOKEN = ""
+        SWARM_MASTER_IP = ""
     }
 
     stages {
