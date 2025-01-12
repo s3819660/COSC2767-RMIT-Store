@@ -188,6 +188,9 @@ pipeline {
         stage("Test on Remote Server") {
             steps {
                 script {
+                    sh '''
+                        chmod +x ansible/playbooks/PullAndTest.yml
+                    '''
                     // Run the Ansible playbook
                     ansiblePlaybook becomeUser: 'ansibleadmin', 
                                     credentialsId: "${env.ANSIBLE_CREDENTIALS}", 
