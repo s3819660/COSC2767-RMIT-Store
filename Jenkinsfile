@@ -191,7 +191,7 @@ pipeline {
                 script {
                     sh """
                         chmod +x ansible/playbooks/PullAndTest.yml
-                        sudo ssh-keyscan -H ${ELASTIC_IP_DEV} >> /home/ansibleadmin/.ssh/known_hosts
+                        sudo -u ansibleadmin ssh-keyscan -H ${ELASTIC_IP_DEV} >> /home/ansibleadmin/.ssh/known_hosts
                     """
                     // Run the Ansible playbook
                     ansiblePlaybook becomeUser: 'ansibleadmin', 
