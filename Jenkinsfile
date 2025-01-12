@@ -278,13 +278,13 @@ pipeline {
             }
         }
 
-        stage('Pause for EC2 Initialization') {
-            steps {
-                script {
-                    sleep(time: 1, unit: 'MINUTES')
-                }
-            }
-        }
+        // stage('Pause for EC2 Initialization') {
+        //     steps {
+        //         script {
+        //             sleep(time: 1, unit: 'MINUTES')
+        //         }
+        //     }
+        // }
 
         stage("Deploy to Swarm") {
             steps {
