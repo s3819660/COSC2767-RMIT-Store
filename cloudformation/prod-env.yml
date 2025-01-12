@@ -447,18 +447,13 @@ Resources:
       VPCZoneIdentifier:
         - !Ref PublicSubnet1
         - !Ref PublicSubnet2
+      # (NEW) Attach the back-end target group so these instances register on port 3000
+      TargetGroupARNs:
+        - !Ref AppTargetGroupBackEnd
       Tags:
         - Key: Name
           Value: BackEndASG
           PropagateAtLaunch: true
-
-  # (NEW) Attach the back-end target group so these instances register on port 3000
-  TargetGroupARNs:
-    - !Ref AppTargetGroupBackEnd
-    Tags:
-      - Key: Name
-        Value: BackEndASG
-        PropagateAtLaunch: true
 
   #####################################
   # 6) Scaling Policies                #
