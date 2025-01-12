@@ -45,13 +45,13 @@
         done
 
     - name: Install Test Dependencies
-      command: source ~/.bashrc && npm install && dnf install -y xorg-x11-server-Xvfb gtk3-devel nss alsa-lib
+      command: source /.bashrc && npm install && dnf install -y xorg-x11-server-Xvfb gtk3-devel nss alsa-lib
       args:
         chdir: /home/ansibleadmin/COSC2767-RMIT-Store
       become: yes
 
     - name: Run Web UI Test
-      command: source ~/.bashrc && npx cypress run
+      command: source /.bashrc && npx cypress run
       args:
         chdir: /home/ansibleadmin/COSC2767-RMIT-Store
       become: yes
