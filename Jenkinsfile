@@ -217,18 +217,15 @@ pipeline {
         stage('CloudFormation Deploy Production Stack') {
             steps {
                 script {
-                    // Optionally, fetch the latest AMI IDs using AWS SSM Parameter Store
-                    /*
-                    IMAGE_ID_FRONTEND = sh (
-                        script: "aws ssm get-parameters --names /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2 --region ${REGION} --query 'Parameters[0].Value' --output text",
-                        returnStdout: true
-                    ).trim()
-
-                    IMAGE_ID_BACKEND = sh (
-                        script: "aws ssm get-parameters --names /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2 --region ${REGION} --query 'Parameters[0].Value' --output text",
-                        returnStdout: true
-                    ).trim()
-                    */
+                    // temp delete stack
+                        // sh '''
+                        //         aws cloudformation delete-stack --stack-name ProdEnv
+                        //     '''
+                        //     // Wait for the stack to be deleted
+                        // sh '''
+                        //         aws cloudformation wait stack-delete-complete \
+                        //             --stack-name ProdEnv
+                        //     '''
 
                     def SWARM_MASTER_TOKEN = sh(script: "docker swarm join-token manager -q", returnStdout: true).trim()
 
