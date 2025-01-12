@@ -196,13 +196,13 @@ pipeline {
 
                     // sudo -u ansibleadmin bash -c "ssh-keyscan -H ${ELASTIC_IP_DEV} >> /home/ansibleadmin/.ssh/known_hosts"
                     // Run the Ansible playbook
-                    // sh """
-                    //     sudo -u ansibleadmin bash -c "ansible-playbook -i /var/lib/jenkins/workspace/rmit-store/ansible/hosts /var/lib/jenkins/workspace/rmit-store/ansible/playbooks/PullAndTest.yml"
-                    // """
-                    ansiblePlaybook credentialsId: "${env.ANSIBLE_CREDENTIALS}", 
-                                    installation: 'Ansible', 
-                                    inventory: 'ansible/hosts',
-                                    playbook: 'ansible/playbooks/PullAndTest.yml'
+                    sh """
+                        sudo -u ansibleadmin bash -c "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i /var/lib/jenkins/workspace/rmit-store/ansible/hosts /var/lib/jenkins/workspace/rmit-store/ansible/playbooks/PullAndTest.yml"
+                    """
+                    // ansiblePlaybook credentialsId: "${env.ANSIBLE_CREDENTIALS}", 
+                    //                 installation: 'Ansible', 
+                    //                 inventory: 'ansible/hosts',
+                    //                 playbook: 'ansible/playbooks/PullAndTest.yml'
 
                     // Read and check the exit code
                     // def exitCode = readFile('/tmp/jenkins/test_exit_code.txt').trim()
