@@ -289,11 +289,58 @@ pipeline {
         stage("Deploy to Swarm") {
             steps {
                 script {
-                    // assign node labels
-                    sh "docker node update --label-add role=client ${env.HOSTNAME_FE}"
-                    sh "docker node update --label-add role=server ${env.HOSTNAME_BE}"
+                    // We assume Jenkins is the Swarm manager.
+                    // The env variables HOSTNAME_FE and HOSTNAME_BE contain the hostnames for the new nodes.
 
-                    // deploy the stack
+                    def feHostname = env.HOSTNAME_FE
+                    def beHostname = env.HOSTNAME_BE
+
+                    // A small helper method to check if a node is known by the manager
+                    def nodeInSwarm = { nodeName ->
+                        def result = sh(script: "docker node ls --format '{{.Hostname}}' | grep -w '${nodeName}' || true", returnStdout: true).trim()
+                        return (result == nodeName)
+                    }
+
+                    // ----- Wait for the front-end node -----
+                    echo "Waiting for node '${feHostname}' to join the swarm..."
+                    def tries = 15                  // Number of retries
+                    def found = false
+                    for (int i = 1; i <= tries; i++) {
+                        if (nodeInSwarm(feHostname)) {
+                            echo "Node '${feHostname}' is in the swarm."
+                            found = true
+                            break
+                        }
+                        echo "Node '${feHostname}' not found yet. Sleeping 10 seconds..."
+                        sleep 10
+                    }
+                    if (!found) {
+                        error("Front-end node '${feHostname}' never appeared in docker node ls after ${tries} retries.")
+                    }
+
+                    // Assign the label
+                    sh "docker node update --label-add role=client ${feHostname}"
+                    
+                    // ----- Wait for the back-end node -----
+                    echo "Waiting for node '${beHostname}' to join the swarm..."
+                    found = false
+                    for (int i = 1; i <= tries; i++) {
+                        if (nodeInSwarm(beHostname)) {
+                            echo "Node '${beHostname}' is in the swarm."
+                            found = true
+                            break
+                        }
+                        echo "Node '${beHostname}' not found yet. Sleeping 10 seconds..."
+                        sleep 10
+                    }
+                    if (!found) {
+                        error("Back-end node '${beHostname}' never appeared in docker node ls after ${tries} retries.")
+                    }
+
+                    // Assign the label
+                    sh "docker node update --label-add role=server ${beHostname}"
+
+                    // Now that both nodes are labeled, you can safely deploy
                     sh "docker stack deploy -c docker-compose.yml ${env.STACK_NAME}"
                 }
             }
