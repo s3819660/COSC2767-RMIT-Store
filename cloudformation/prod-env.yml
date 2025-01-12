@@ -140,6 +140,7 @@ Resources:
   ################################
 
   # ALB Security Group (only allow HTTP on 8080)
+  # ALB Security Group
   ALBSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -149,6 +150,11 @@ Resources:
         - IpProtocol: tcp
           FromPort: 8080
           ToPort: 8080
+          CidrIp: 0.0.0.0/0
+        # (NEW) Allow inbound traffic on port 3000 for the back-end service
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
           CidrIp: 0.0.0.0/0
         - IpProtocol: tcp
           FromPort: 2376
@@ -312,6 +318,25 @@ Resources:
       HealthyThresholdCount: 2
       UnhealthyThresholdCount: 5
 
+  # (NEW) Target Group for the Back-End on port 3000
+  AppTargetGroupBackEnd:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: "ProdTGBackEnd"
+      Port: 3000
+      Protocol: HTTP
+      VpcId: !Ref ProdVPC
+      TargetType: instance
+      HealthCheckProtocol: HTTP
+      HealthCheckPort: "3000"
+      HealthCheckPath: /
+      Matcher:
+        HttpCode: "200"
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 10
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 5
+
   ALBListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
@@ -321,6 +346,17 @@ Resources:
       DefaultActions:
         - Type: forward
           TargetGroupArn: !Ref AppTargetGroup
+
+  # (NEW) ALB Listener on port 3000 for back-end
+  ALBListenerBackEnd:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref AppLoadBalancer
+      Protocol: HTTP
+      Port: 3000
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref AppTargetGroupBackEnd
 
   #####################################
   # 4) Launch Templates                #
@@ -415,6 +451,14 @@ Resources:
         - Key: Name
           Value: BackEndASG
           PropagateAtLaunch: true
+
+  # (NEW) Attach the back-end target group so these instances register on port 3000
+  TargetGroupARNs:
+    - !Ref AppTargetGroupBackEnd
+    Tags:
+      - Key: Name
+        Value: BackEndASG
+        PropagateAtLaunch: true
 
   #####################################
   # 6) Scaling Policies                #

@@ -249,6 +249,7 @@ pipeline {
                     // Wait for stack to be fully deployed
                     sh """
                         aws cloudformation wait stack-create-complete --stack-name ProdEnv
+                        sh 'aws cloudformation describe-stack-events --stack-name ProdEnv --max-items 20'
                     """
 
                     // Retrieve stack outputs and set them as environment variables
