@@ -1,17 +1,17 @@
 // Load environment variables from a .env file into process.env
-require('dotenv').config();
+require("dotenv").config();
 
 // Import required modules
-const express = require('express');
-const chalk = require('chalk');
-const cors = require('cors');
-const helmet = require('helmet');
+const express = require("express");
+const chalk = require("chalk");
+const cors = require("cors");
+const helmet = require("helmet");
 
 // Import custom modules
-const keys = require('./config/keys');
-const routes = require('./routes');
-const socket = require('./socket');
-const setupDB = require('./utils/db');
+const keys = require("./config/keys");
+const routes = require("./routes");
+const socket = require("./socket");
+const setupDB = require("./utils/db");
 
 // Destructure port from keys configuration
 const { port } = keys;
@@ -27,7 +27,7 @@ app.use(express.json());
 app.use(
   helmet({
     contentSecurityPolicy: false, // Disable CSP for compatibility reasons
-    frameguard: true // Enable frameguard to prevent clickjacking
+    frameguard: true, // Enable frameguard to prevent clickjacking
   })
 );
 
@@ -38,15 +38,17 @@ app.use(cors());
 setupDB();
 
 // Configure Passport.js for authentication
-require('./config/passport')(app);
+require("./config/passport")(app);
 
 // Use the defined routes for handling requests
 app.use(routes);
 
+// module.exports = app;
+
 // Start the server and listen on the specified port
-const server = app.listen(port, '0.0.0.0', () => {
+const server = app.listen(port, "0.0.0.0", () => {
   console.log(
-    `${chalk.green('✓')} ${chalk.blue(
+    `${chalk.green("✓")} ${chalk.blue(
       `Listening on port ${port}. Visit http://localhost:${port}/ in your browser.`
     )}`
   );
