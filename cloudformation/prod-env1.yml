@@ -172,12 +172,34 @@ Resources:
           FromPort: 22
           ToPort: 22
           CidrIp: !Ref TrustedSSHCIDR # Restrict SSH access
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
+          CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
         - IpProtocol: -1
           CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
           Value: FrontEndSG
+
+  # Backend Load Balancer Security Group
+  BackendLoadBalancerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Security Group for Internal Backend Load Balancer"
+      VpcId: !Ref ProdVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
+          SourceSecurityGroupId: !Ref FrontEndSecurityGroup
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: BackendLB-SG
 
   # Back-End EC2 Security Group
   BackEndSecurityGroup:
@@ -190,6 +212,11 @@ Resources:
           FromPort: 3000
           ToPort: 3000
           SourceSecurityGroupId: !GetAtt FrontEndSecurityGroup.GroupId
+        # Allow traffic from internal ALB on port 3000 (API traffic)
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
+          SourceSecurityGroupId: !Ref BackendLoadBalancerSecurityGroup
         - IpProtocol: tcp
           FromPort: 27017
           ToPort: 27017
@@ -197,7 +224,7 @@ Resources:
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          CidrIp: !Ref TrustedSSHCIDR # Restrict SSH access
+          CidrIp: !Ref TrustedSSHCIDR
       SecurityGroupEgress:
         - IpProtocol: -1
           CidrIp: 0.0.0.0/0
@@ -221,6 +248,20 @@ Resources:
       Scheme: internet-facing
       Type: application
       IpAddressType: ipv4
+
+  BackendLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: "ProdBeALB"
+      Scheme: internal
+      Subnets:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      SecurityGroups:
+        - !Ref BackendLoadBalancerSecurityGroup
+      LoadBalancerAttributes:
+        - Key: idle_timeout.timeout_seconds
+          Value: "60"
 
   AppTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -249,6 +290,20 @@ Resources:
       DefaultActions:
         - Type: forward
           TargetGroupArn: !Ref AppTargetGroup
+
+  BackendTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: backend-target-group
+      VpcId: !Ref ProdVPC
+      Protocol: HTTP
+      Port: 3000
+      TargetType: instance
+      HealthCheckProtocol: HTTP
+      HealthCheckPath: /health # not sure, may change?
+      HealthCheckPort: "3000"
+      Matcher:
+        HttpCode: "200"
 
   #####################################
   # 4) Launch Templates                #
@@ -337,6 +392,8 @@ Resources:
       VPCZoneIdentifier:
         - !Ref PublicSubnet1
         - !Ref PublicSubnet2
+      TargetGroupARNs:
+        - !Ref BackendTargetGroup
       Tags:
         - Key: Name
           Value: BackEndASG
