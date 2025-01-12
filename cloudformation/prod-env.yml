@@ -383,8 +383,7 @@ Resources:
             yum install -y docker
             service docker start
             systemctl enable docker
-            sudo yum install -y nmap-ncat
-            nc -zv 3.222.41.140 2377
+            sudo docker swarm leave --force
             sudo docker swarm join --token ${SwarmMasterToken} ${SwarmMasterIP}:2377
 
   # Launch Template for Back-End EC2 Instances
@@ -408,6 +407,7 @@ Resources:
             yum install -y docker
             service docker start
             systemctl enable docker
+            sudo docker swarm leave --force
             sudo docker swarm join --token ${SwarmMasterToken} ${SwarmMasterIP}:2377
 
   #####################################
