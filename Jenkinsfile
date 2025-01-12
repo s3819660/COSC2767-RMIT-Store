@@ -135,7 +135,7 @@ pipeline {
                         echo "AWS Region: ${env.AWS_REGION}"
 
                         def ssh_pub_key = sh(script: '''
-                            sudo cat /home/ansibleadmin/.ssh/id_rsa.pub
+                            sudo cat /var/lib/jenkins/.ssh/id_rsa.pub
                         ''', returnStdout: true).trim()
 
                         // Check if the stack exists
@@ -192,17 +192,17 @@ pipeline {
                     sh """
                         chmod +x ansible/playbooks/PullAndTest.yml
                         ssh-keyscan -H ${ELASTIC_IP_DEV} >> /var/lib/jenkins/.ssh/known_hosts
-                        sudo -u ansibleadmin bash -c "ssh-keyscan -H ${ELASTIC_IP_DEV} >> /home/ansibleadmin/.ssh/known_hosts"
                     """
+
+                    // sudo -u ansibleadmin bash -c "ssh-keyscan -H ${ELASTIC_IP_DEV} >> /home/ansibleadmin/.ssh/known_hosts"
                     // Run the Ansible playbook
-                    sh """
-                        sudo -u ansibleadmin bash -c "ansible-playbook -i /var/lib/jenkins/workspace/rmit-store/ansible/hosts /var/lib/jenkins/workspace/rmit-store/ansible/playbooks/PullAndTest.yml"
-                    """
-                    // ansiblePlaybook becomeUser: 'ansibleadmin', 
-                    //                 credentialsId: "${env.ANSIBLE_CREDENTIALS}", 
-                    //                 installation: 'Ansible', 
-                    //                 inventory: 'ansible/hosts', 
-                    //                 playbook: 'ansible/playbooks/PullAndTest.yml'
+                    // sh """
+                    //     sudo -u ansibleadmin bash -c "ansible-playbook -i /var/lib/jenkins/workspace/rmit-store/ansible/hosts /var/lib/jenkins/workspace/rmit-store/ansible/playbooks/PullAndTest.yml"
+                    // """
+                    ansiblePlaybook credentialsId: "${env.ANSIBLE_CREDENTIALS}", 
+                                    installation: 'Ansible', 
+                                    inventory: 'ansible/hosts',
+                                    playbook: 'ansible/playbooks/PullAndTest.yml'
 
                     // Read and check the exit code
                     // def exitCode = readFile('/tmp/jenkins/test_exit_code.txt').trim()
