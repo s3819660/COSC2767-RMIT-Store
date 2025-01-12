@@ -335,7 +335,7 @@ Resources:
             yum install -y docker
             service docker start
             systemctl enable docker
-            docker swarm join --token ${SwarmMasterToken} ${SwarmMasterIP}:2377
+            sudo docker swarm join --token ${SwarmMasterToken} ${SwarmMasterIP}:2377
 
   # Launch Template for Back-End EC2 Instances
   BackEndLaunchTemplate:
@@ -358,7 +358,7 @@ Resources:
             yum install -y docker
             service docker start
             systemctl enable docker
-            docker swarm join --token ${SwarmMasterToken} ${SwarmMasterIP}:2377
+            sudo docker swarm join --token ${SwarmMasterToken} ${SwarmMasterIP}:2377
 
   #####################################
   # 5) Auto Scaling Groups             #
