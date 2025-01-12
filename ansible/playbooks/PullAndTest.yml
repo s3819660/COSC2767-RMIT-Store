@@ -11,17 +11,17 @@
           sleep 2
         done
 
-    - name: Copy test output to control machine
-      fetch:
-        src: /tmp/test_output.txt
-        dest: /tmp/test_output.txt
-        flat: yes
+    # - name: Copy test output to control machine
+    #   fetch:
+    #     src: /tmp/jenkins/test_output.txt
+    #     dest: /tmp/test_output.txt
+    #     flat: yes
 
-    - name: Copy test exit code to control machine
-      fetch:
-        src: /tmp/test_exit_code.txt
-        dest: /tmp/test_exit_code.txt
-        flat: yes
+    # - name: Copy test exit code to control machine
+    #   fetch:
+    #     src: /tmp/jenkins/test_exit_code.txt
+    #     dest: /tmp/test_exit_code.txt
+    #     flat: yes
 
     - name: Stop and remove the container
       shell: |
