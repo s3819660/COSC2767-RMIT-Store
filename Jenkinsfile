@@ -289,6 +289,7 @@ pipeline {
         stage("Deploy to Swarm") {
             steps {
                 script {
+                    echo "join token: ${SWARM_MASTER_TOKEN} and IP ${SWARM_MASTER_IP}"
                     // assign node labels
                     sh "docker node update --label-add role=client ${env.HOSTNAME_FE}"
                     sh "docker node update --label-add role=server ${env.HOSTNAME_BE}"
