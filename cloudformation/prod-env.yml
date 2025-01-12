@@ -268,13 +268,13 @@ Resources:
         UserData:
           Fn::Base64: |
             #!/bin/bash
-            HOSTNAME=${HostnameFE}
+            HOSTNAME="${HostnameFE}"
             hostnamectl set-hostname "$HOSTNAME"
             yum update -y
             yum install -y docker
             service docker start
             systemctl enable docker
-            docker swarm join --token ${SwarmMasterToken} ${SwarmMasterIP}:2377
+            docker swarm join --token "${SwarmMasterToken}" "${SwarmMasterIP}":2377
 
   # Launch Template for Back-End EC2 Instances
   BackEndLaunchTemplate:
