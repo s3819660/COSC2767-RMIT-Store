@@ -54,12 +54,9 @@ pipeline {
                         docker rmi -f $(docker images -aq)
                     fi
                 '''
-                sh '''
-                    truncate -s 0 /var/lib/jenkins/.ssh/known_hosts
-                '''
-                sh '''
-                    sudo truncate -s 0 /home/ansibleadmin/.ssh/known_hosts
-                '''
+                // sh '''
+                //     truncate -s 0 /var/lib/jenkins/.ssh/known_hosts
+                // '''
             }
         }
 
@@ -139,20 +136,20 @@ pipeline {
                         ''', returnStdout: true).trim()
 
                         // Check if the stack exists
-                        def stackExists = sh(script: '''
-                            aws cloudformation describe-stacks --stack-name DevEnv > /dev/null 2>&1 && echo true || echo false
-                        ''', returnStdout: true).trim()
+                        // def stackExists = sh(script: '''
+                        //     aws cloudformation describe-stacks --stack-name DevEnv > /dev/null 2>&1 && echo true || echo false
+                        // ''', returnStdout: true).trim()
 
-                        if (stackExists == 'true') {    // delete stack if it exists
-                            sh '''
-                                aws cloudformation delete-stack --stack-name DevEnv
-                            '''
-                            // Wait for the stack to be deleted
-                            sh '''
-                                aws cloudformation wait stack-delete-complete \
-                                    --stack-name DevEnv
-                            '''
-                        }
+                        // if (stackExists == 'true') {    // delete stack if it exists
+                        //     sh '''
+                        //         aws cloudformation delete-stack --stack-name DevEnv
+                        //     '''
+                        //     // Wait for the stack to be deleted
+                        //     sh '''
+                        //         aws cloudformation wait stack-delete-complete \
+                        //             --stack-name DevEnv
+                        //     '''
+                        // }
 
                         // Create the stack
                         sh """
@@ -191,13 +188,13 @@ pipeline {
                 script {
                     sh """
                         chmod +x ansible/playbooks/PullAndTest.yml
-                        ssh-keyscan -H ${ELASTIC_IP_DEV} >> /var/lib/jenkins/.ssh/known_hosts
+                        ssh-keyscan ${ELASTIC_IP_DEV} >> /var/lib/jenkins/.ssh/known_hosts
                     """
 
                     // sudo -u ansibleadmin bash -c "ssh-keyscan -H ${ELASTIC_IP_DEV} >> /home/ansibleadmin/.ssh/known_hosts"
                     // Run the Ansible playbook
                     sh """
-                        ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i /var/lib/jenkins/workspace/rmit-store/ansible/hosts /var/lib/jenkins/workspace/rmit-store/ansible/playbooks/PullAndTest.yml
+                        ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ansible/hosts ansible/playbooks/PullAndTest.yml
                     """
                     // ansiblePlaybook credentialsId: "${env.ANSIBLE_CREDENTIALS}", 
                     //                 installation: 'Ansible', 
