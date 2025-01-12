@@ -78,15 +78,13 @@ Resources:
           #!/bin/bash
           echo "sshpubkey ${SshPubKey}"
           useradd ansibleadmin
-          echo "ansibleadmin:1234" | chpasswd
+          passwd -d ansibleadmin
           sudo yum install -y docker
           sudo systemctl enable docker
           sudo systemctl start docker
           usermod -aG docker ansibleadmin
           echo "ansibleadmin ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
           sudo yum install -y ansible
-          sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
-          systemctl restart sshd
           if [ ! -f /home/ansibleadmin/.ssh/authorized_keys ]; then
             sudo mkdir -p /home/ansibleadmin/.ssh
             sudo echo "${SshPubKey}" > /home/ansibleadmin/.ssh/authorized_keys
