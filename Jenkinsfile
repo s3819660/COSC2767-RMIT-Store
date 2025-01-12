@@ -152,24 +152,24 @@ pipeline {
                         // }
 
                         // Create the stack
-                        sh """
-                            aws cloudformation deploy \
-                                --template-file dev-env.yml \
-                                --stack-name DevEnv \
-                                --capabilities CAPABILITY_IAM \
-                                --parameter-overrides \
-                                    KeyName=${env.KEY_NAME} \
-                                    VpcId=${env.VPC_ID_DEV} \
-                                    SubnetId=${env.SUBNET_ID_DEV} \
-                                    SshPubKey='${ssh_pub_key}' \
-                                    ElasticIpId=${env.ELASTIC_ID_DEV}
-                        """
+                        // sh """
+                        //     aws cloudformation deploy \
+                        //         --template-file dev-env.yml \
+                        //         --stack-name DevEnv \
+                        //         --capabilities CAPABILITY_IAM \
+                        //         --parameter-overrides \
+                        //             KeyName=${env.KEY_NAME} \
+                        //             VpcId=${env.VPC_ID_DEV} \
+                        //             SubnetId=${env.SUBNET_ID_DEV} \
+                        //             SshPubKey='${ssh_pub_key}' \
+                        //             ElasticIpId=${env.ELASTIC_ID_DEV}
+                        // """
 
-                            // Wait for the stack to be created
-                        sh '''
-                            aws cloudformation wait stack-create-complete \
-                                --stack-name DevEnv
-                        '''
+                        //     // Wait for the stack to be created
+                        // sh '''
+                        //     aws cloudformation wait stack-create-complete \
+                        //         --stack-name DevEnv
+                        // '''
                     }
                 }
             }
@@ -184,10 +184,14 @@ pipeline {
                     """
 
                     // sudo -u ansibleadmin bash -c "ssh-keyscan -H ${ELASTIC_IP_DEV} >> /home/ansibleadmin/.ssh/known_hosts"
+
+
                     // Run the Ansible playbook
-                    sh """
-                        ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ansible/hosts ansible/playbooks/PullAndTest.yml
-                    """
+                    // sh """
+                    //     ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ansible/hosts ansible/playbooks/PullAndTest.yml
+                    // """
+
+
                     // ansiblePlaybook credentialsId: "${env.ANSIBLE_CREDENTIALS}", 
                     //                 installation: 'Ansible', 
                     //                 inventory: 'ansible/hosts',
