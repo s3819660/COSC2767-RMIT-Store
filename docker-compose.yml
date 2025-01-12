@@ -1,6 +1,6 @@
 services:
   client:
-    image: ${env.IMAGE_NAME}-client:latest
+    image: ${IMAGE_NAME}-client:latest
     ports:
       - "8080:8080"
     deploy:
@@ -11,7 +11,7 @@ services:
 
 
   server:
-    image: ${env.IMAGE_NAME}-server:latest
+    image: ${IMAGE_NAME}-server:latest
     ports:
       - "3000:3000"
     deploy:
