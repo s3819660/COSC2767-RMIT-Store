@@ -256,12 +256,12 @@ pipeline {
 
                     // Wait for stack to be fully deployed
                     sh """
-                        aws cloudformation wait stack-update-complete --stack-name ${STACK_NAME} --region ${REGION}
+                        aws cloudformation wait stack-update-complete --stack-name ProdEnv --region ${env.AWS_REGION}
                     """
 
                     // Retrieve stack outputs and set them as environment variables
                     def stackOutputs = sh (
-                        script: "aws cloudformation describe-stacks --stack-name ${STACK_NAME} --region ${REGION} --query 'Stacks[0].Outputs' --output json",
+                        script: "aws cloudformation describe-stacks --stack-name ProdEnv --region ${env.AWS_REGION} --query 'Stacks[0].Outputs' --output json",
                         returnStdout: true
                     ).trim()
 
