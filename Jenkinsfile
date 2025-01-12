@@ -39,9 +39,6 @@ pipeline {
         TRUSTED_SSH_CIDR = "0.0.0.0/0" // CIDR block for SSH access to EC2 instances
         HOSTNAME_FE = "worker-client"
         HOSTNAME_BE = "worker-server" // Hostname of the backend server
-
-        SWARM_MASTER_TOKEN = ""
-        SWARM_MASTER_IP = ""
     }
 
     stages {
@@ -236,9 +233,9 @@ pipeline {
                     ).trim()
                     */
 
-                    env.SWARM_MASTER_TOKEN = sh(script: "docker swarm join-token manager -q", returnStdout: true).trim()
+                    def SWARM_MASTER_TOKEN = sh(script: "docker swarm join-token manager -q", returnStdout: true).trim()
 
-                    env.SWARM_MASTER_IP = sh(script: "hostname -I | awk '{print \$1}'", returnStdout: true).trim()
+                    def SWARM_MASTER_IP = sh(script: "hostname -I | awk '{print \$1}'", returnStdout: true).trim()
 
                     // Deploy or update the CloudFormation stack
                     sh """
@@ -295,7 +292,6 @@ pipeline {
         stage("Deploy to Swarm") {
             steps {
                 script {
-                    echo "join token: ${env.SWARM_MASTER_TOKEN} and IP ${env.SWARM_MASTER_IP}"
                     // assign node labels
                     sh "docker node update --label-add role=client ${env.HOSTNAME_FE}"
                     sh "docker node update --label-add role=server ${env.HOSTNAME_BE}"
