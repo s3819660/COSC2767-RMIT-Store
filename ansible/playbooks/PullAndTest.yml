@@ -2,6 +2,12 @@
 - hosts: TestDevServer
 
   tasks:
+    - name: Remove all containers
+      command: docker rm -f $(docker ps -a -q)
+
+    - name: Remove all images
+      command: docker rmi -f $(docker images -aq)
+
     - name: Start the Client Docker container
       command: docker run -d --name fe-container -p 8080:8080 benhuhaudau/rmit-store-client
 
