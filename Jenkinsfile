@@ -195,11 +195,14 @@ pipeline {
                         sudo -u ansibleadmin bash -c "ssh-keyscan -H ${ELASTIC_IP_DEV} >> /home/ansibleadmin/.ssh/known_hosts"
                     """
                     // Run the Ansible playbook
-                    ansiblePlaybook becomeUser: 'ansibleadmin', 
-                                    credentialsId: "${env.ANSIBLE_CREDENTIALS}", 
-                                    installation: 'Ansible', 
-                                    inventory: 'ansible/hosts', 
-                                    playbook: 'ansible/playbooks/PullAndTest.yml'
+                    sh """
+                        sudo -u ansibleadmin bash -c "ansible-playbook -i ansible/hosts ansible/playbooks/PullAndTest.yml"
+                    """
+                    // ansiblePlaybook becomeUser: 'ansibleadmin', 
+                    //                 credentialsId: "${env.ANSIBLE_CREDENTIALS}", 
+                    //                 installation: 'Ansible', 
+                    //                 inventory: 'ansible/hosts', 
+                    //                 playbook: 'ansible/playbooks/PullAndTest.yml'
 
                     // Read and check the exit code
                     // def exitCode = readFile('/tmp/jenkins/test_exit_code.txt').trim()
