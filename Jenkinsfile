@@ -54,7 +54,7 @@ pipeline {
                     fi
                 '''
                 sh '''
-                    sh 'truncate -s 0 /var/lib/jenkins/.ssh/known_hosts'
+                    truncate -s 0 /var/lib/jenkins/.ssh/known_hosts
                 '''
             }
         }
