@@ -56,6 +56,9 @@ pipeline {
                 sh '''
                     truncate -s 0 /var/lib/jenkins/.ssh/known_hosts
                 '''
+                sh '''
+                    truncate -s 0 /home/ansibleadmin/.ssh/known_hosts
+                '''
             }
         }
 
