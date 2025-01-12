@@ -61,22 +61,19 @@ pipeline {
             }
         }
 
-        /* 
+        
         stage("Unit Test") {
             steps {
-                parallel(
-                    "Client": {
-                        dir('client') {
-                            sh """
-                                npm install
-                                npm test
-                            """
-                        }   
-                    }
-                )
+                script {
+                    sh """
+                        npm install
+                        npx jest unit
+                    """
+                }
             }
         } 
 
+        /*
         // create Docker image -> push to Docker Hub -> pull back to build image
         stage("Build & Push Docker images") {
             steps {
@@ -104,7 +101,9 @@ pipeline {
                 }
             }
         }
+        */
 
+        /*
         stage("Pull Docker Image") { // New stage added to pull the latest image
             steps {
                 script {
@@ -177,7 +176,21 @@ pipeline {
             }
         }
     }
-        
+
+    stage("Ping Remote Server") {
+        steps {
+            script {
+                // Run the Ansible playbook
+                ansiblePlaybook becomeUser: 'ansibleadmin', 
+                                credentialsId: "${env.ANSIBLE_CREDENTIALS}", 
+                                installation: 'Ansible', 
+                                inventory: 'ansible/hosts', 
+                                playbook: "ansible/playbooks/PingAll.yml"
+            }
+        }
+    }
+
+    /*    
     stage("Test on Remote Server") {
         steps {
             script {
@@ -200,7 +213,7 @@ pipeline {
             }
         }
     }
-
+    */
     
 
     // post {
