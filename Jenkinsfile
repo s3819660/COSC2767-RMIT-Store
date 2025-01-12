@@ -53,6 +53,9 @@ pipeline {
                         docker rmi -f $(docker images -aq)
                     fi
                 '''
+                sh '''
+                    sh 'truncate -s 0 /var/lib/jenkins/.ssh/known_hosts'
+                '''
             }
         }
 
