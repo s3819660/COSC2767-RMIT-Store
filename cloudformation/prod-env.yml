@@ -45,12 +45,12 @@ Parameters:
     Type: String
     Description: "Private IP address of the Docker Swarm master node"
 
-  Hostname-FE:
+  HostnameFE:
     Type: String
     Default: "FrontEnd"
     Description: "Hostname for Front-End EC2 instances"
 
-  Hostname-BE:
+  HostnameBE:
     Type: String
     Default: "BackEnd"
     Description: "Hostname for Back-End EC2 instances"
@@ -323,7 +323,7 @@ Resources:
         UserData:
           Fn::Base64: |
             #!/bin/bash
-            HOSTNAME=${Hostname-FE}
+            HOSTNAME=${HostnameFE}
             hostnamectl set-hostname "$HOSTNAME"
             yum update -y
             yum install -y docker
@@ -345,7 +345,7 @@ Resources:
         UserData:
           Fn::Base64: |
             #!/bin/bash
-            HOSTNAME=${Hostname-BE}
+            HOSTNAME=${HostnameBE}
             hostnamectl set-hostname "$HOSTNAME"
             yum update -y
             yum install -y docker
