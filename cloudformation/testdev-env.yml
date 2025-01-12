@@ -94,6 +94,21 @@ Resources:
             sudo echo "${SshPubKey}" >> /home/ansibleadmin/.ssh/authorized_keys
           fi
 
+          # Install fnm
+          curl -fsSL https://fnm.vercel.app/install | bash
+
+          # Activate fnm
+          source ~/.bashrc
+
+          # Install and use Node.js version 22
+          fnm use --install-if-missing 22
+
+          # Verify Node.js installation
+          node -v
+
+          # Verify npm installation
+          npm -v
+
           cd /home/ansibleadmin/
           [ ! -d "COSC2767-RMIT-Store" ] && git clone https://github.com/s3819660/COSC2767-RMIT-Store || echo "Directory 'COSC2767-RMIT-Store' already exists"
           git fetch origin && (git show-ref --quiet refs/heads/phuc/integrate_with_test && git checkout phuc/integrate_with_test && git pull origin phuc/integrate_with_test || git checkout -b phuc/integrate_with_test --track origin/phuc/integrate_with_test)
