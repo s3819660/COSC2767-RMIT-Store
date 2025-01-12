@@ -3,13 +3,16 @@
 
   tasks:
     - name: Kill all
-      shell: docker kill $(docker ps -q)
+      shell: |
+        docker kill $(docker ps -q)
 
     - name: Remove all containers
-      shell: docker rm $(docker ps -a -q)
+      shell: |
+        docker rm $(docker ps -a -q)
 
     - name: Remove all images
-      shell: docker rmi -f $(docker images -aq)
+      shell: |
+        docker rmi -f $(docker images -aq)
 
     - name: Start the Client Docker container
       command: docker run -d --name fe-container -p 8080:8080 benhuhaudau/rmit-store-client
