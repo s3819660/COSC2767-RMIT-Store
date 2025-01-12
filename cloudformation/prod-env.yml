@@ -290,13 +290,13 @@ Resources:
         UserData:
           Fn::Base64: |
             #!/bin/bash
-            HOSTNAME=${HostnameBE}
+            HOSTNAME="${HostnameBE}"
             hostnamectl set-hostname "$HOSTNAME"
             yum update -y
             yum install -y docker
             service docker start
             systemctl enable docker
-            docker swarm join --token ${SwarmMasterToken} ${SwarmMasterIP}:2377
+            docker swarm join --token "${SwarmMasterToken}" "${SwarmMasterIP}":2377
 
   #####################################
   # 5) Auto Scaling Groups             #
