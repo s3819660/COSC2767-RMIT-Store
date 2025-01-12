@@ -18,7 +18,7 @@ pipeline {
         IMAGE_TAG = "${RELEASE}-${env.BUILD_NUMBER}"      // will be updated in another pipeline
 
         SERVICE_NAME = "${APP_NAME}-service"
-        DP_STACK_NAME = "deploy"
+        STACK_NAME = "deploy"
 
         AWS_REGION = "us-east-1"
         SNS_TOPIC_ARN = "arn:aws:sns:us-east-1:975050071897:test-topic"
@@ -297,7 +297,7 @@ pipeline {
                     sh "docker node update --label-add role=server ${env.HOSTNAME_BE}"
 
                     // deploy the stack
-                    sh "docker stack deploy -c docker-compose.yml ${env.DP_STACK_NAME}"
+                    sh "docker stack deploy -c docker-compose.yml ${env.STACK_NAME}"
                 }
             }
         }
