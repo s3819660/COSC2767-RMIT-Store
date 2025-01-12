@@ -260,27 +260,27 @@ pipeline {
                     """
 
                     // Retrieve stack outputs and set them as environment variables
-                    def stackOutputs = sh (
-                        script: "aws cloudformation describe-stacks --stack-name ProdEnv --region ${env.AWS_REGION} --query 'Stacks[0].Outputs' --output json",
-                        returnStdout: true
-                    ).trim()
+                    // def stackOutputs = sh (
+                    //     script: "aws cloudformation describe-stacks --stack-name ProdEnv --region ${env.AWS_REGION} --query 'Stacks[0].Outputs' --output json",
+                    //     returnStdout: true
+                    // ).trim()
 
-                    def outputs = readJSON text: stackOutputs
+                    // def outputs = readJSON text: stackOutputs
 
-                    // Extract specific outputs
-                    def loadBalancerDNS = outputs.find { it.OutputKey == 'LoadBalancerDNS' }?.OutputValue
-                    def frontEndASGName = outputs.find { it.OutputKey == 'FrontEndAutoScalingGroupName' }?.OutputValue
-                    def backEndASGName = outputs.find { it.OutputKey == 'BackEndAutoScalingGroupName' }?.OutputValue
+                    // // Extract specific outputs
+                    // def loadBalancerDNS = outputs.find { it.OutputKey == 'LoadBalancerDNS' }?.OutputValue
+                    // def frontEndASGName = outputs.find { it.OutputKey == 'FrontEndAutoScalingGroupName' }?.OutputValue
+                    // def backEndASGName = outputs.find { it.OutputKey == 'BackEndAutoScalingGroupName' }?.OutputValue
 
-                    // Set environment variables for subsequent stages
-                    env.LOAD_BALANCER_DNS = loadBalancerDNS
-                    env.FRONT_END_ASG_NAME = frontEndASGName
-                    env.BACK_END_ASG_NAME = backEndASGName
+                    // // Set environment variables for subsequent stages
+                    // env.LOAD_BALANCER_DNS = loadBalancerDNS
+                    // env.FRONT_END_ASG_NAME = frontEndASGName
+                    // env.BACK_END_ASG_NAME = backEndASGName
 
-                    // (Optional) Echo the outputs
-                    echo "Load Balancer DNS: ${env.LOAD_BALANCER_DNS}"
-                    echo "Front-End ASG Name: ${env.FRONT_END_ASG_NAME}"
-                    echo "Back-End ASG Name: ${env.BACK_END_ASG_NAME}"
+                    // // (Optional) Echo the outputs
+                    // echo "Load Balancer DNS: ${env.LOAD_BALANCER_DNS}"
+                    // echo "Front-End ASG Name: ${env.FRONT_END_ASG_NAME}"
+                    // echo "Back-End ASG Name: ${env.BACK_END_ASG_NAME}"
                 }
             }
         }
