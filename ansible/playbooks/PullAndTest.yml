@@ -6,7 +6,7 @@
       command: docker kill $(docker ps -q)
 
     - name: Remove all containers
-      command: docker rm -f $(docker ps -a -q)
+      command: docker rm $(docker ps -a -q)
 
     - name: Remove all images
       command: docker rmi -f $(docker images -aq)
