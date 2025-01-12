@@ -174,14 +174,6 @@ pipeline {
                 }
             }
         }
-
-        // stage('Pause for EC2 Initialization') {
-        //     steps {
-        //         script {
-        //             sleep(time: 1, unit: 'MINUTES')
-        //         }
-        //     }
-        // }
         
         stage("Test on Remote Server") {
             steps {
@@ -218,14 +210,14 @@ pipeline {
             steps {
                 script {
                     // temp delete stack
-                        // sh '''
-                        //         aws cloudformation delete-stack --stack-name ProdEnv
-                        //     '''
-                        //     // Wait for the stack to be deleted
-                        // sh '''
-                        //         aws cloudformation wait stack-delete-complete \
-                        //             --stack-name ProdEnv
-                        //     '''
+                        sh '''
+                                aws cloudformation delete-stack --stack-name ProdEnv
+                            '''
+                            // Wait for the stack to be deleted
+                        sh '''
+                                aws cloudformation wait stack-delete-complete \
+                                    --stack-name ProdEnv
+                            '''
 
                     def SWARM_MASTER_TOKEN = sh(script: "docker swarm join-token worker -q", returnStdout: true).trim()
 
@@ -255,9 +247,9 @@ pipeline {
                     """
 
                     // Wait for stack to be fully deployed
-                    // sh """
-                    //     aws cloudformation wait stack-update-complete --stack-name ProdEnv
-                    // """
+                    sh """
+                        aws cloudformation wait stack-create-complete --stack-name ProdEnv
+                    """
 
                     // Retrieve stack outputs and set them as environment variables
                     // def stackOutputs = sh (
@@ -281,6 +273,14 @@ pipeline {
                     // echo "Load Balancer DNS: ${env.LOAD_BALANCER_DNS}"
                     // echo "Front-End ASG Name: ${env.FRONT_END_ASG_NAME}"
                     // echo "Back-End ASG Name: ${env.BACK_END_ASG_NAME}"
+                }
+            }
+        }
+
+        stage('Pause for EC2 Initialization') {
+            steps {
+                script {
+                    sleep(time: 2, unit: 'MINUTES')
                 }
             }
         }

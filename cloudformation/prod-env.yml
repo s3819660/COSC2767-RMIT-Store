@@ -328,6 +328,7 @@ Resources:
         UserData:
           Fn::Base64: !Sub |
             #!/bin/bash
+            set -e
             HOSTNAME=${HostnameFE}
             hostnamectl set-hostname "$HOSTNAME"
             yum update -y
@@ -350,6 +351,7 @@ Resources:
         UserData:
           Fn::Base64: !Sub |
             #!/bin/bash
+            set -e
             HOSTNAME=${HostnameBE}
             hostnamectl set-hostname "$HOSTNAME"
             yum update -y
