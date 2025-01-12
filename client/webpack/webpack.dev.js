@@ -1,3 +1,4 @@
+const webpack = require('webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpackMerge = require('webpack-merge');
@@ -68,7 +69,10 @@ const config = {
   },
   plugins: [
     // Load environment variables from .env file
-    new Dotenv(),
+    //new Dotenv(),
+    new Dotenv({
+      path: './.env.development', // Load the correct .env file
+    }),
     // Generate HTML file with injected script and style tags
     new HtmlWebpackPlugin({
       template: path.join(CURRENT_WORKING_DIR, 'public/index.html'),

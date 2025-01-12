@@ -1,5 +1,7 @@
 // Load environment variables from a .env file into process.env
 require("dotenv").config();
+console.log("MONGO_URI",process.env.MONGO_URI)
+console.log("CLIENT_URL=",process.env.CLIENT_URL) 
 
 // Import required modules
 const express = require("express");
