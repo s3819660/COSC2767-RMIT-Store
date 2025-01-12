@@ -4,15 +4,27 @@
   tasks:
     - name: Kill all
       shell: |
-        docker kill $(docker ps -q)
-
+        if [ "$(docker ps -q)" ]; then
+          docker kill $(docker ps -q)
+        else
+          echo "No running containers to kill"
+        fi
+        
     - name: Remove all containers
       shell: |
-        docker rm $(docker ps -a -q)
-
+        if [ "$(docker ps -a -q)" ]; then
+          docker rm $(docker ps -a -q)
+        else
+          echo "No containers to remove"
+        fi
+        
     - name: Remove all images
       shell: |
-        docker rmi -f $(docker images -aq)
+        if [ "$(docker images -aq)" ]; then
+          docker rmi -f $(docker images -aq)
+        else
+          echo "No images no remove"
+        fi
 
     - name: Start the Client Docker container
       command: docker run -d --name fe-container -p 8080:8080 benhuhaudau/rmit-store-client
