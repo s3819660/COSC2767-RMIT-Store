@@ -196,7 +196,7 @@ pipeline {
                     """
                     // Run the Ansible playbook
                     sh """
-                        sudo -u ansibleadmin bash -c "ansible-playbook -i ansible/hosts ansible/playbooks/PullAndTest.yml"
+                        sudo -u ansibleadmin bash -c "ansible-playbook -i /var/lib/jenkins/workspace/rmit-store/ansible/hosts /var/lib/jenkins/workspace/rmit-store/ansible/playbooks/PullAndTest.yml"
                     """
                     // ansiblePlaybook becomeUser: 'ansibleadmin', 
                     //                 credentialsId: "${env.ANSIBLE_CREDENTIALS}", 
