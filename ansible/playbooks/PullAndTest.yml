@@ -44,6 +44,9 @@
           sleep 2
         done
 
+    - name: Run Web UI Test
+      command: npx cypress run
+
     # - name: Copy test output to control machine
     #   fetch:
     #     src: /tmp/test_output.txt
