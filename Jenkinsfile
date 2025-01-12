@@ -33,6 +33,7 @@ pipeline {
         VPC_ID_DEV = "vpc-0b042585e9ec719f9"
         SUBNET_ID_DEV = "subnet-08996f374a5237f33"
         ELASTIC_ID_DEV = "eipalloc-0352959bcb4bfe70d"
+        ELASTIC_IP_DEV = "23.20.223.181"
         IMAGE_ID_FRONTEND = "ami-05576a079321f21f8"
         IMAGE_ID_BACKEND = "ami-05576a079321f21f8"
         TRUSTED_SSH_CIDR = "0.0.0.0/0" // CIDR block for SSH access to EC2 instances
@@ -188,9 +189,10 @@ pipeline {
         stage("Test on Remote Server") {
             steps {
                 script {
-                    sh '''
+                    sh """
                         chmod +x ansible/playbooks/PullAndTest.yml
-                    '''
+                        sudo ssh-keyscan -H ${ELASTIC_IP_DEV} >> /home/ansibleadmin/.ssh/known_hosts
+                    """
                     // Run the Ansible playbook
                     ansiblePlaybook becomeUser: 'ansibleadmin', 
                                     credentialsId: "${env.ANSIBLE_CREDENTIALS}", 
