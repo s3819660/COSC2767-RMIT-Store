@@ -8,6 +8,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const webpackMerge = require('webpack-merge');
+const Dotenv = require('dotenv-webpack');
 
 // Import common configuration
 const common = require('./webpack.common');
