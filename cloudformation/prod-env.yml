@@ -197,11 +197,11 @@ Resources:
         - IpProtocol: tcp
           FromPort: 8080
           ToPort: 8080
-          SourceSecurityGroupId: !GetAtt ALBSecurityGroup.GroupId
+          CidrIp: 0.0.0.0/0
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          CidrIp: !Ref TrustedSSHCIDR # Restrict SSH access
+          CidrIp: 0.0.0.0/0
         - IpProtocol: tcp
           FromPort: 2376
           ToPort: 2376
@@ -243,15 +243,15 @@ Resources:
         - IpProtocol: tcp
           FromPort: 3000
           ToPort: 3000
-          SourceSecurityGroupId: !GetAtt FrontEndSecurityGroup.GroupId
+          CidrIp: 0.0.0.0/0
         - IpProtocol: tcp
           FromPort: 27017
           ToPort: 27017
-          SourceSecurityGroupId: !GetAtt FrontEndSecurityGroup.GroupId
+          CidrIp: 0.0.0.0/0
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          CidrIp: !Ref TrustedSSHCIDR # Restrict SSH access
+          CidrIp: 0.0.0.0/0
         - IpProtocol: tcp
           FromPort: 2376
           ToPort: 2376
@@ -384,6 +384,8 @@ Resources:
             service docker start
             systemctl enable docker
             sudo docker swarm leave --force
+            sudo reboot
+            sleep 45
             sudo docker swarm join --token ${SwarmMasterToken} ${SwarmMasterIP}:2377
 
   # Launch Template for Back-End EC2 Instances
@@ -418,6 +420,8 @@ Resources:
             service docker start
             systemctl enable docker
             sudo docker swarm leave --force
+            sudo reboot
+            sleep 45
             sudo docker swarm join --token ${SwarmMasterToken} ${SwarmMasterIP}:2377
 
   #####################################

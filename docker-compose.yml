@@ -1,6 +1,6 @@
 services:
   client:
-    image: ${IMAGE_NAME}-client:latest
+    image: nhan2102/rmit-store-client:latest
     ports:
       - "8080:8080"
     deploy:
@@ -10,7 +10,7 @@ services:
           - node.labels.role == client
 
   server:
-    image: ${IMAGE_NAME}-server:latest
+    image: nhan2102/rmit-store-server:latest
     ports:
       - "3000:3000"
     deploy:
