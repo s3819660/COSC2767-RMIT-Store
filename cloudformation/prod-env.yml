@@ -405,6 +405,16 @@ Resources:
             hostnamectl set-hostname "$HOSTNAME"
             yum update -y
             yum install -y docker
+            sudo tee /etc/yum.repos.d/mongodb-org-6.0.repo <<EOF
+            [mongodb-org-6.0]
+            name=MongoDB Repository
+            baseurl=https://repo.mongodb.org/yum/amazon/2023/mongodb-org/6.0/x86_64/
+            gpgcheck=1
+            enabled=1
+            gpgkey=https://www.mongodb.org/static/pgp/server-6.0.asc
+            EOF
+            sudo yum install -y mongodb-org
+            sudo yum install mongodb-mongosh-shared-openssl3 -y
             service docker start
             systemctl enable docker
             sudo docker swarm leave --force
