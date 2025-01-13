@@ -22,7 +22,7 @@ app.use('/api/auth', authRoutes);
 
 describe('Auth Routes', () => {
   beforeAll(async () => {
-    const url = `mongodb://54.85.38.55:27017/rmit_ecommerce`; // fix this to link to .env file
+    const url = `mongodb://34.230.65.227:27017/rmit_ecommerce`; // fix this to link to .env file
     await mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
   });
 
@@ -30,14 +30,14 @@ describe('Auth Routes', () => {
     await mongoose.connection.close();
   });
 
-  afterEach(async () => {
-    await User.deleteMany({});
-  });
+  // afterEach(async () => {
+  //   await User.deleteMany({});
+  // });
 
   it('should register a new user', async () => {
     const requestBody = {
       "isSubscribed": false,
-      "email": "xyz123@integrate.com",
+      "email": "aaaaaa@integrate.com",
       "firstName": "John",
       "lastName": "Doe",
       "password": "123456",
@@ -65,7 +65,7 @@ describe('Auth Routes', () => {
     });
     await newUser.save();
 
-    const response = await request('http://localhost:3000')
+    const response = await request('http://54.156.23.27:3000')
       .post('/api/auth/login')
       .set('Content-Type', 'application/json')
       .send({ email: 'test@example.com', password: 'password123' });
