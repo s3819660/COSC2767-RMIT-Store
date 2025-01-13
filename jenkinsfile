@@ -213,20 +213,26 @@ pipeline {
         }
     }
 
-    stage("Run Integration and Web UI Test on Remote Server") {
+    stage("Run Integration Test on Remote Server") {
         steps {
-            // dir('cypress') {
             script {
                 sh """
-                    npm install
+                    npx jest integration
+                """
+            }
+        }
+    }
+
+    stage("Run Web UI Test on Remote Server") {
+        steps {
+            script {
+                sh """
                     sudo dnf install -y xorg-x11-server-Xvfb gtk3-devel nss alsa-lib
                     npx cypress run
                 """
-                }
-            // }
+            }
         }
     }
-    
     
 
     // post {
