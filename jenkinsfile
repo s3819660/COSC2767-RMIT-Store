@@ -75,7 +75,7 @@ pipeline {
 
         
         // create Docker image -> push to Docker Hub -> pull back to build image
-        stage("Build & Push Docker images") {
+        /*stage("Build & Push Docker images") {
             steps {
                 script {
                     parallel(
@@ -100,7 +100,7 @@ pipeline {
                     )
                 }
             }
-        }
+        }*/
         
 
         /*
