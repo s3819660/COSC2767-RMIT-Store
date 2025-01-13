@@ -212,14 +212,14 @@ pipeline {
             steps {
                 script {
                     // temp delete stack
-                        sh '''
-                                aws cloudformation delete-stack --stack-name ProdEnv
-                            '''
-                            // Wait for the stack to be deleted
-                        sh '''
-                                aws cloudformation wait stack-delete-complete \
-                                    --stack-name ProdEnv
-                         '''
+                        // sh '''
+                        //         aws cloudformation delete-stack --stack-name ProdEnv
+                        //     '''
+                        //     // Wait for the stack to be deleted
+                        // sh '''
+                        //         aws cloudformation wait stack-delete-complete \
+                        //             --stack-name ProdEnv
+                        //  '''
 
                     def SWARM_MASTER_TOKEN = sh(script: "docker swarm join-token worker -q", returnStdout: true).trim()
 
