@@ -1,7 +1,7 @@
 // filepath: cypress/integration/auth.spec.js
 describe('User Registration', () => {
   beforeEach(() => {
-    cy.visit('http://localhost:8080/register')
+    cy.visit('http://54.156.23.27:8080/register')
   })
 
 
