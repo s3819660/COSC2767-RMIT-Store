@@ -110,16 +110,16 @@ pipeline {
             }
         }
 
-        // stage("Pull Docker Image") { // New stage added to pull the latest image
-        //     steps {
-        //         script {
-        //             sh """
-        //                 docker pull ${IMAGE_NAME}-client:latest
-        //                 docker pull ${IMAGE_NAME}-server:latest
-        //             """
-        //         }
-        //     }
-        // }
+        stage("Pull Docker Image") { // New stage added to pull the latest image
+            steps {
+                script {
+                    sh """
+                        docker pull ${IMAGE_NAME}-client:latest
+                        docker pull ${IMAGE_NAME}-server:latest
+                    """
+                }
+            }
+        }
 
 
         stage('CloudFormation Deploy Dev Environment') {
