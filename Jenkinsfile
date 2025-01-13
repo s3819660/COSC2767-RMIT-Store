@@ -341,6 +341,7 @@ pipeline {
 
                     // Assign the label
                     sh "docker node update --label-add role=server ${beHostname}"
+                    sh "docker node update --label-add role=server ${feHostname}"
 
                     // Now that both nodes are labeled, you can safely deploy
                     sh "docker stack deploy -c docker-compose.yml ${env.STACK_NAME}"
