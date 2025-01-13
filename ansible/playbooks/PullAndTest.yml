@@ -49,7 +49,7 @@
         source /.bashrc && fnm use --install-if-missing 22 && npm install && dnf install -y xorg-x11-server-Xvfb gtk3-devel nss alsa-lib && npx cypress run
       args:
         chdir: /home/ansibleadmin/COSC2767-RMIT-Store
-      # become: yes
+      become: yes
 
     # - name: Run Web UI Test
     #   shell: | 
