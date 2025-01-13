@@ -8,7 +8,13 @@ describe('User Registration', () => {
     it('should register a new user', () => {
       cy.intercept('POST', `${Cypress.env('API_URL')}/register`).as('registerRequest');
 
-      const newEmail = "cypress1@example.com";
+
+      const generateRandomEmail = () => {
+        const timestamp = Date.now(); // Use current timestamp for uniqueness
+        return `user${timestamp}@example.com`;
+      };
+      
+      const newEmail = generateRandomEmail();
       const newFirstName = "Cypress";
       const newLastName = "Cypress";
       const newPassword = "password123";
