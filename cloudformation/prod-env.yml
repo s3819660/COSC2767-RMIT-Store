@@ -310,7 +310,7 @@ Resources:
       TargetType: instance
       HealthCheckProtocol: HTTP
       HealthCheckPort: "8080" # Changed to 8080
-      HealthCheckPath: /
+      HealthCheckPath: /health
       Matcher:
         HttpCode: "200"
       HealthCheckIntervalSeconds: 30
@@ -329,7 +329,7 @@ Resources:
       TargetType: instance
       HealthCheckProtocol: HTTP
       HealthCheckPort: "3000"
-      HealthCheckPath: /
+      HealthCheckPath: /health
       Matcher:
         HttpCode: "200"
       HealthCheckIntervalSeconds: 30
