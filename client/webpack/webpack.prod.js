@@ -124,6 +124,9 @@ const config = {
     ]
   },
   plugins: [
+    new Dotenv({
+      path: './.env', // Load the correct .env file
+    }),
     // Define environment variables for the client-side code
     new webpack.DefinePlugin({
       'process.env': {

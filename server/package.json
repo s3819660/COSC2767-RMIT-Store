@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "RMIT Ecommerce Server",
   "scripts": {
-    "dev": "nodemon",
+    "dev": "dotenv -e .env.development node index.js",
+    "prod": "dotenv -e .env node index.js",
     "start": "cross-env NODE_ENV=production node index.js",
     "seed:db": "node utils/seed.js"
   },
