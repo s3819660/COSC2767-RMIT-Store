@@ -215,16 +215,15 @@ pipeline {
 
     stage("Run Integration and Web UI Test on Remote Server") {
         steps {
-            dir('cypress') {
-                script {
-                    sh """
-                        npm install
-                        sudo dnf install -y xorg-x11-server-Xvfb gtk3-devel nss alsa-lib
-                        sudo cp ../cypress.config.js /var/lib/jenkins/workspace/TestRmitStore/cypress/cypress.config.js
-                        npx cypress run
-                    """
+            // dir('cypress') {
+            script {
+                sh """
+                    npm install
+                    sudo dnf install -y xorg-x11-server-Xvfb gtk3-devel nss alsa-lib
+                    npx cypress run
+                """
                 }
-            }
+            // }
         }
     }
     
