@@ -212,14 +212,14 @@ pipeline {
             steps {
                 script {
                     // temp delete stack
-                        // sh '''
-                        //         aws cloudformation delete-stack --stack-name ProdEnv
-                        //     '''
-                        //     // Wait for the stack to be deleted
-                        // sh '''
-                        //         aws cloudformation wait stack-delete-complete \
-                        //             --stack-name ProdEnv
-                        //  '''
+                        sh '''
+                                aws cloudformation delete-stack --stack-name ProdEnv
+                            '''
+                            // Wait for the stack to be deleted
+                        sh '''
+                                aws cloudformation wait stack-delete-complete \
+                                    --stack-name ProdEnv
+                         '''
 
                     def SWARM_MASTER_TOKEN = sh(script: "docker swarm join-token worker -q", returnStdout: true).trim()
 
@@ -340,11 +340,11 @@ pipeline {
                     // }
 
                     // Assign the label
-                    sh "docker node update --label-add role=server ${beHostname}"
-                    sh "docker node update --label-add role=client ${feHostname}"
+                    // sh "docker node update --label-add role=server ${beHostname}"
+                    // sh "docker node update --label-add role=client ${feHostname}"
 
-                    // Now that both nodes are labeled, you can safely deploy
-                    sh "docker stack deploy -c docker-compose.yml ${env.STACK_NAME}"
+                    // // Now that both nodes are labeled, you can safely deploy
+                    // sh "docker stack deploy -c docker-compose.yml ${env.STACK_NAME}"
                 }
             }
         }

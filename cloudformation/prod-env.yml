@@ -329,7 +329,7 @@ Resources:
       TargetType: instance
       HealthCheckProtocol: HTTP
       HealthCheckPort: "3000"
-      HealthCheckPath: /health
+      HealthCheckPath: /
       Matcher:
         HttpCode: "200"
       HealthCheckIntervalSeconds: 30

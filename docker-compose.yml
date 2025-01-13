@@ -9,7 +9,6 @@ services:
         constraints:
           - node.labels.role == client
 
-
   server:
     image: ${IMAGE_NAME}-server:latest
     ports:
