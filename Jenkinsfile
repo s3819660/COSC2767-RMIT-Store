@@ -212,14 +212,14 @@ pipeline {
             steps {
                 script {
                     // temp delete stack
-                    sh '''
-                        aws cloudformation delete-stack --stack-name ProdEnv
-                    '''
-                            // Wait for the stack to be deleted
-                    sh '''
-                        aws cloudformation wait stack-delete-complete \
-                            --stack-name ProdEnv
-                    '''
+                    // sh '''
+                    //     aws cloudformation delete-stack --stack-name ProdEnv
+                    // '''
+                    //         // Wait for the stack to be deleted
+                    // sh '''
+                    //     aws cloudformation wait stack-delete-complete \
+                    //         --stack-name ProdEnv
+                    // '''
 
                     def SWARM_MASTER_TOKEN = sh(script: "docker swarm join-token worker -q", returnStdout: true).trim()
 
@@ -298,53 +298,51 @@ pipeline {
                     def beHostname = env.HOSTNAME_BE
 
                     // A small helper method to check if a node is known by the manager
-                    // def nodeInSwarm = { nodeName ->
-                    //     def result = sh(script: "docker node ls --format '{{.Hostname}}' | grep -w '${nodeName}' || true", returnStdout: true).trim()
-                    //     return (result == nodeName)
-                    // }
+                    def nodeInSwarm = { nodeName ->
+                        def result = sh(script: "docker node ls --format '{{.Hostname}}' | grep -w '${nodeName}' || true", returnStdout: true).trim()
+                        return (result == nodeName)
+                    }
 
                     // // ----- Wait for the front-end node -----
-                    // echo "Waiting for node '${feHostname}' to join the swarm..."
-                    // def tries = 7                  // Number of retries
-                    // def found = false
-                    // for (int i = 1; i <= tries; i++) {
-                    //     if (nodeInSwarm(feHostname)) {
-                    //         echo "Node '${feHostname}' is in the swarm."
-                    //         found = true
-                    //         break
-                    //     }
-                    //     echo "Node '${feHostname}' not found yet. Sleeping 10 seconds..."
-                    //     sleep 10
-                    // }
-                    // if (!found) {
-                    //     error("Front-end node '${feHostname}' never appeared in docker node ls after ${tries} retries.")
-                    // }
+                    echo "Waiting for node '${feHostname}' to join the swarm..."
+                    def tries = 7                  // Number of retries
+                    def found = false
+                    for (int i = 1; i <= tries; i++) {
+                        if (nodeInSwarm(feHostname)) {
+                            echo "Node '${feHostname}' is in the swarm."
+                            found = true
+                            break
+                        }
+                        echo "Node '${feHostname}' not found yet. Sleeping 10 seconds..."
+                        sleep 10
+                    }
+                    if (!found) {
+                        error("Front-end node '${feHostname}' never appeared in docker node ls after ${tries} retries.")
+                    }
 
-                    // // Assign the label
-                    // sh "docker node update --label-add role=client ${feHostname}"
                     
                     // // ----- Wait for the back-end node -----
-                    // echo "Waiting for node '${beHostname}' to join the swarm..."
-                    // found = false
-                    // for (int i = 1; i <= tries; i++) {
-                    //     if (nodeInSwarm(beHostname)) {
-                    //         echo "Node '${beHostname}' is in the swarm."
-                    //         found = true
-                    //         break
-                    //     }
-                    //     echo "Node '${beHostname}' not found yet. Sleeping 10 seconds..."
-                    //     sleep 10
-                    // }
-                    // if (!found) {
-                    //     error("Back-end node '${beHostname}' never appeared in docker node ls after ${tries} retries.")
-                    // }
+                    echo "Waiting for node '${beHostname}' to join the swarm..."
+                    found = false
+                    for (int i = 1; i <= tries; i++) {
+                        if (nodeInSwarm(beHostname)) {
+                            echo "Node '${beHostname}' is in the swarm."
+                            found = true
+                            break
+                        }
+                        echo "Node '${beHostname}' not found yet. Sleeping 10 seconds..."
+                        sleep 10
+                    }
+                    if (!found) {
+                        error("Back-end node '${beHostname}' never appeared in docker node ls after ${tries} retries.")
+                    }
 
                     // Assign the label
-                    // sh "docker node update --label-add role=server ${beHostname}"
-                    // sh "docker node update --label-add role=client ${feHostname}"
+                    sh "docker node update --label-add role=server ${beHostname}"
+                    sh "docker node update --label-add role=client ${feHostname}"
 
-                    // // Now that both nodes are labeled, you can safely deploy
-                    // sh "docker stack deploy -c docker-compose.yml ${env.STACK_NAME}"
+                    // Now that both nodes are labeled, you can safely deploy
+                    sh "docker stack deploy -c docker-compose.yml ${env.STACK_NAME}"
                 }
             }
         }
