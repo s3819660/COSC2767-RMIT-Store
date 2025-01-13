@@ -8,7 +8,7 @@ describe('User Registration', () => {
     it('should register a new user', () => {
       cy.intercept('POST', `${Cypress.env('API_URL')}/register`).as('registerRequest');
 
-      const newEmail = "cypress@example.com";
+      const newEmail = "cypress1@example.com";
       const newFirstName = "Cypress";
       const newLastName = "Cypress";
       const newPassword = "password123";
