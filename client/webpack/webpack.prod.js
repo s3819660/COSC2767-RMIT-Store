@@ -188,7 +188,18 @@ const config = {
       },
       canPrint: true
     })
-  ]
+  ],
+  devServer: {
+    // Configuration for webpack-dev-server
+    port: 8080,
+    host: '0.0.0.0', // Listen on all network interfaces
+    open: true,
+    inline: true,
+    compress: true,
+    hot: true,
+    disableHostCheck: true,
+    historyApiFallback: true
+  }
 };
 
 // Merge common configuration with production-specific configuration
