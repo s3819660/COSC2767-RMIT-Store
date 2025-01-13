@@ -75,7 +75,7 @@ pipeline {
 
         
         // create Docker image -> push to Docker Hub -> pull back to build image
-        stage("Build & Push Docker images") {
+        /*stage("Build & Push Docker images") {
             steps {
                 script {
                     parallel(
@@ -100,7 +100,7 @@ pipeline {
                     )
                 }
             }
-        }
+        }*/
         
 
         /*
@@ -190,7 +190,7 @@ pipeline {
     }*/
 
         
-    stage("Test on Remote Server") {
+    stage("Deploy Dev Server") {
         steps {
             script {
                 // Run the Ansible playbook
@@ -209,6 +209,20 @@ pipeline {
                 // }
 
                 echo "Tests passed successfully."
+            }
+        }
+    }
+
+    stage("Run Integration and Web UI Test on Remote Server") {
+        steps {
+            dir('cypress') {
+                script {
+                    sh """
+                        npm install
+                        dnf install -y xorg-x11-server-Xvfb gtk3-devel nss alsa-lib
+                        npx cypress run
+                    """
+                }
             }
         }
     }
