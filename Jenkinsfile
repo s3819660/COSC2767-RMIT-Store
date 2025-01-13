@@ -83,32 +83,32 @@ pipeline {
         // }
 
         // create Docker image -> push to Docker Hub -> pull back to build image
-        // stage("Build & Push Docker images") {
-        //     steps {
-        //         script {
-        //             parallel(
-        //                 "Client": {
-        //                     dir('client') {
-        //                         docker.withRegistry('', DOCKER_CREDENTIALS) {
-        //                         def clientImage = docker.build("${IMAGE_NAME}-client")
-        //                         clientImage.push("${IMAGE_TAG}")
-        //                         clientImage.push("latest")
-        //                         }
-        //                     }
-        //                 },
-        //                 "Server": {
-        //                     dir('server') {
-        //                         docker.withRegistry('', DOCKER_CREDENTIALS) {
-        //                         def serverImage = docker.build("${IMAGE_NAME}-server")
-        //                         serverImage.push("${IMAGE_TAG}")
-        //                         serverImage.push("latest")
-        //                         }
-        //                     }
-        //                 }
-        //             )
-        //         }
-        //     }
-        // }
+        stage("Build & Push Docker images") {
+            steps {
+                script {
+                    parallel(
+                        "Client": {
+                            dir('client') {
+                                docker.withRegistry('', DOCKER_CREDENTIALS) {
+                                def clientImage = docker.build("${IMAGE_NAME}-client")
+                                clientImage.push("${IMAGE_TAG}")
+                                clientImage.push("latest")
+                                }
+                            }
+                        },
+                        "Server": {
+                            dir('server') {
+                                docker.withRegistry('', DOCKER_CREDENTIALS) {
+                                def serverImage = docker.build("${IMAGE_NAME}-server")
+                                serverImage.push("${IMAGE_TAG}")
+                                serverImage.push("latest")
+                                }
+                            }
+                        }
+                    )
+                }
+            }
+        }
 
         // stage("Pull Docker Image") { // New stage added to pull the latest image
         //     steps {
@@ -337,9 +337,9 @@ pipeline {
                         error("Back-end node '${beHostname}' never appeared in docker node ls after ${tries} retries.")
                     }
 
-                    // Assign the label
-                    sh "docker node update --label-add role=server ${beHostname}"
-                    sh "docker node update --label-add role=client ${feHostname}"
+                    // Assign the label -> Need put condition for labeling
+                    // sh "docker node update --label-add role=server ${beHostname}"
+                    // sh "docker node update --label-add role=client ${feHostname}"
 
                     // Now that both nodes are labeled, you can safely deploy
                     sh "docker stack deploy -c docker-compose.yml ${env.STACK_NAME}"
