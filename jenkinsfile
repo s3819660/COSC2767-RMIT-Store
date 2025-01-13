@@ -219,7 +219,7 @@ pipeline {
                 script {
                     sh """
                         npm install
-                        dnf install -y xorg-x11-server-Xvfb gtk3-devel nss alsa-lib
+                        sudo dnf install -y xorg-x11-server-Xvfb gtk3-devel nss alsa-lib
                         npx cypress run
                     """
                 }
