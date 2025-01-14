@@ -8,10 +8,10 @@ pipeline {
 
     // identify environment variables
     environment {
-        APP_NAME = "rmit-store"
+        APP_NAME = "prod-rmit-store"
         RELEASE = "1.0.0"
-        DOCKER_USER = "nhan2102"
-        DOCKER_CREDENTIALS = "dockerhub"
+        DOCKER_USER = "benhuhaudau"
+        DOCKER_CREDENTIALS = "dockerhub-credentials"
         ANSIBLE_CREDENTIALS = "ansible"
 
         IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"       // !!!!! should be this form either can not push !!!!!
@@ -28,12 +28,10 @@ pipeline {
         PUBLIC_SUBNET2_CIDR = '10.0.2.0/24'
 
         GITHUB_URL = "https://github.com/s3819660/COSC2767-RMIT-Store.git"
-        GIT_BRANCH = "nhan-test"
-        KEY_NAME = "devops_project_key"
-        VPC_ID_DEV = "vpc-0b042585e9ec719f9"
-        SUBNET_ID_DEV = "subnet-08996f374a5237f33"
-        ELASTIC_ID_DEV = "eipalloc-0352959bcb4bfe70d"
-        ELASTIC_IP_DEV = "23.20.223.181"
+        GIT_BRANCH = "phuc/nhan-test-prod"
+        KEY_NAME = "devops_project_key_other_account"
+        VPC_ID_DEV = "vpc-087ade8aa993e0b95"
+        SUBNET_ID_DEV = "subnet-0b1d2b67dccb76fb1"
         IMAGE_ID_FRONTEND = "ami-05576a079321f21f8"
         IMAGE_ID_BACKEND = "ami-05576a079321f21f8"
         TRUSTED_SSH_CIDR = "0.0.0.0/0" // CIDR block for SSH access to EC2 instances
