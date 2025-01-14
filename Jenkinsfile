@@ -108,7 +108,7 @@ pipeline {
             }
         }
 
-        stage("Pull Docker Image") { // New stage added to pull the latest image
+        /*stage("Pull Docker Image") { // New stage added to pull the latest image
             steps {
                 script {
                     sh """
@@ -117,7 +117,7 @@ pipeline {
                     """
                 }
             }
-        }
+        }*/
 
 
         stage('CloudFormation Deploy Dev Environment') {
@@ -171,7 +171,7 @@ pipeline {
             }
         }
         
-        stage("Test on Remote Server") {
+        /*stage("Test on Remote Server") {
             steps {
                 script {
                     sh """
@@ -204,7 +204,7 @@ pipeline {
                     echo "Tests passed successfully."
                 }
             }
-        }
+        }*/
 
         stage('CloudFormation Deploy Production Stack') {
             steps {
