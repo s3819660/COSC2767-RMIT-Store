@@ -83,32 +83,32 @@ pipeline {
         // }
 
         // create Docker image -> push to Docker Hub -> pull back to build image
-        stage("Build & Push Docker images") {
-            steps {
-                script {
-                    parallel(
-                        "Client": {
-                            dir('client') {
-                                docker.withRegistry('', DOCKER_CREDENTIALS) {
-                                def clientImage = docker.build("${IMAGE_NAME}-client")
-                                clientImage.push("${IMAGE_TAG}")
-                                clientImage.push("latest")
-                                }
-                            }
-                        },
-                        "Server": {
-                            dir('server') {
-                                docker.withRegistry('', DOCKER_CREDENTIALS) {
-                                def serverImage = docker.build("${IMAGE_NAME}-server")
-                                serverImage.push("${IMAGE_TAG}")
-                                serverImage.push("latest")
-                                }
-                            }
-                        }
-                    )
-                }
-            }
-        }
+        // stage("Build & Push Docker images") {
+        //     steps {
+        //         script {
+        //             parallel(
+        //                 "Client": {
+        //                     dir('client') {
+        //                         docker.withRegistry('', DOCKER_CREDENTIALS) {
+        //                         def clientImage = docker.build("${IMAGE_NAME}-client")
+        //                         clientImage.push("${IMAGE_TAG}")
+        //                         clientImage.push("latest")
+        //                         }
+        //                     }
+        //                 },
+        //                 "Server": {
+        //                     dir('server') {
+        //                         docker.withRegistry('', DOCKER_CREDENTIALS) {
+        //                         def serverImage = docker.build("${IMAGE_NAME}-server")
+        //                         serverImage.push("${IMAGE_TAG}")
+        //                         serverImage.push("latest")
+        //                         }
+        //                     }
+        //                 }
+        //             )
+        //         }
+        //     }
+        // }
 
         // stage("Pull Docker Image") { // New stage added to pull the latest image
         //     steps {
@@ -212,14 +212,14 @@ pipeline {
             steps {
                 script {
                     // temp delete stack
-                    // sh '''
-                    //     aws cloudformation delete-stack --stack-name ProdEnv
-                    // '''
-                    //         // Wait for the stack to be deleted
-                    // sh '''
-                    //     aws cloudformation wait stack-delete-complete \
-                    //         --stack-name ProdEnv
-                    // '''
+                    sh '''
+                        aws cloudformation delete-stack --stack-name ProdEnv
+                    '''
+                            // Wait for the stack to be deleted
+                    sh '''
+                        aws cloudformation wait stack-delete-complete \
+                            --stack-name ProdEnv
+                    '''
 
                     def SWARM_MASTER_TOKEN = sh(script: "docker swarm join-token worker -q", returnStdout: true).trim()
 
@@ -307,35 +307,35 @@ pipeline {
                     echo "Waiting for node '${feHostname}' to join the swarm..."
                     def tries = 5                  // Number of retries
                     def found = false
-                    // for (int i = 1; i <= tries; i++) {
-                    //     if (nodeInSwarm(feHostname)) {
-                    //         echo "Node '${feHostname}' is in the swarm."
-                    //         found = true
-                    //         break
-                    //     }
-                    //     echo "Node '${feHostname}' not found yet. Sleeping 10 seconds..."
-                    //     sleep 10
-                    // }
-                    // if (!found) {
-                    //     error("Front-end node '${feHostname}' never appeared in docker node ls after ${tries} retries.")
-                    // }
+                    for (int i = 1; i <= tries; i++) {
+                        if (nodeInSwarm(feHostname)) {
+                            echo "Node '${feHostname}' is in the swarm."
+                            found = true
+                            break
+                        }
+                        echo "Node '${feHostname}' not found yet. Sleeping 10 seconds..."
+                        sleep 10
+                    }
+                    if (!found) {
+                        error("Front-end node '${feHostname}' never appeared in docker node ls after ${tries} retries.")
+                    }
 
                     
                     // // ----- Wait for the back-end node -----
                     echo "Waiting for node '${beHostname}' to join the swarm..."
                     found = false
-                    // for (int i = 1; i <= tries; i++) {
-                    //     if (nodeInSwarm(beHostname)) {
-                    //         echo "Node '${beHostname}' is in the swarm."
-                    //         found = true
-                    //         break
-                    //     }
-                    //     echo "Node '${beHostname}' not found yet. Sleeping 10 seconds..."
-                    //     sleep 10
-                    // }
-                    // if (!found) {
-                    //     error("Back-end node '${beHostname}' never appeared in docker node ls after ${tries} retries.")
-                    // }
+                    for (int i = 1; i <= tries; i++) {
+                        if (nodeInSwarm(beHostname)) {
+                            echo "Node '${beHostname}' is in the swarm."
+                            found = true
+                            break
+                        }
+                        echo "Node '${beHostname}' not found yet. Sleeping 10 seconds..."
+                        sleep 10
+                    }
+                    if (!found) {
+                        error("Back-end node '${beHostname}' never appeared in docker node ls after ${tries} retries.")
+                    }
 
                     // Assign the label -> Need put condition for labeling
                     sh "docker node update --label-add role=server ${beHostname}"
