@@ -83,43 +83,43 @@ pipeline {
         // }
 
         // create Docker image -> push to Docker Hub -> pull back to build image
-        // stage("Build & Push Docker images") {
-        //     steps {
-        //         script {
-        //             parallel(
-        //                 "Client": {
-        //                     dir('client') {
-        //                         docker.withRegistry('', DOCKER_CREDENTIALS) {
-        //                         def clientImage = docker.build("${IMAGE_NAME}-client")
-        //                         clientImage.push("${IMAGE_TAG}")
-        //                         clientImage.push("latest")
-        //                         }
-        //                     }
-        //                 },
-        //                 "Server": {
-        //                     dir('server') {
-        //                         docker.withRegistry('', DOCKER_CREDENTIALS) {
-        //                         def serverImage = docker.build("${IMAGE_NAME}-server")
-        //                         serverImage.push("${IMAGE_TAG}")
-        //                         serverImage.push("latest")
-        //                         }
-        //                     }
-        //                 }
-        //             )
-        //         }
-        //     }
-        // }
+        stage("Build & Push Docker images") {
+            steps {
+                script {
+                    parallel(
+                        "Client": {
+                            dir('client') {
+                                docker.withRegistry('', DOCKER_CREDENTIALS) {
+                                def clientImage = docker.build("${IMAGE_NAME}-client")
+                                clientImage.push("${IMAGE_TAG}")
+                                clientImage.push("latest")
+                                }
+                            }
+                        },
+                        "Server": {
+                            dir('server') {
+                                docker.withRegistry('', DOCKER_CREDENTIALS) {
+                                def serverImage = docker.build("${IMAGE_NAME}-server")
+                                serverImage.push("${IMAGE_TAG}")
+                                serverImage.push("latest")
+                                }
+                            }
+                        }
+                    )
+                }
+            }
+        }
 
-        // stage("Pull Docker Image") { // New stage added to pull the latest image
-        //     steps {
-        //         script {
-        //             sh """
-        //                 docker pull ${IMAGE_NAME}-client:latest
-        //                 docker pull ${IMAGE_NAME}-server:latest
-        //             """
-        //         }
-        //     }
-        // }
+        stage("Pull Docker Image") { // New stage added to pull the latest image
+            steps {
+                script {
+                    sh """
+                        docker pull ${IMAGE_NAME}-client:latest
+                        docker pull ${IMAGE_NAME}-server:latest
+                    """
+                }
+            }
+        }
 
 
         stage('CloudFormation Deploy Dev Environment') {
