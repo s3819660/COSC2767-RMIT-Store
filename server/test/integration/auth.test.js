@@ -22,7 +22,7 @@ app.use('/api/auth', authRoutes);
 
 describe('Auth Routes', () => {
   beforeAll(async () => {
-    const url = `mongodb://34.230.65.227:27017/rmit_ecommerce`; // fix this to link to .env file
+    const url = `mongodb://34.226.129.202:27017/rmit_ecommerce`; // fix this to link to .env file
     await mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
   });
 
