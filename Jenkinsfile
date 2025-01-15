@@ -133,7 +133,7 @@ pipeline {
         }
     } */
 
-        stage('CloudFormation Deploy') {
+        stage('CloudFormation Deploy Development Stack') {
             steps {
                 dir('cloudformation') {
                     script {
