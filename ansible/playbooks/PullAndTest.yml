@@ -27,10 +27,10 @@
         fi
 
     - name: Start the Client Docker container
-      command: docker run -d --name fe-container -p 8080:8080 benhuhaudau/rmit-store-client
+      command: docker run -d --name fe-container -p 8080:8080 nhan2102/rmit-store-client
 
     - name: Start the Server Docker container
-      command: docker run -d --name be-container -p 3000:3000 benhuhaudau/rmit-store-server
+      command: docker run -d --name be-container -p 3000:3000 nhan2102/rmit-store-server
 
     - name: Wait for the client container to be ready
       shell: |
