@@ -71,16 +71,18 @@ pipeline {
         }
 
         
-        /* stage("Unit Test") {
+        stage("Unit Test") {
             steps {
                 script {
                     sh """
                         npm install
                         npx jest unit
+
+                        echo "Test Result: Unit Test Passed"
                     """
                 }
             }
-        } */
+        }
 
         
         // create Docker image -> push to Docker Hub -> pull back to build image
