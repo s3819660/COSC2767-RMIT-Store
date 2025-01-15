@@ -133,119 +133,251 @@ pipeline {
         }
     } */
 
-    stage('CloudFormation Deploy') {
-        steps {
-            dir('cloudformation') {
-                script {
-                    // test
-                    echo "AWS Region: ${env.AWS_REGION}"
+        stage('CloudFormation Deploy') {
+            steps {
+                dir('cloudformation') {
+                    script {
+                        // test
+                        echo "AWS Region: ${env.AWS_REGION}"
 
-                    def ssh_pub_key = sh(script: '''
-                        sudo cat /home/ansibleadmin/.ssh/id_rsa.pub
-                    ''', returnStdout: true).trim()
+                        def ssh_pub_key = sh(script: '''
+                            sudo cat /home/ansibleadmin/.ssh/id_rsa.pub
+                        ''', returnStdout: true).trim()
 
-                    // Check if the stack exists
-                    // def stackExists = sh(script: '''
-                    //     aws cloudformation describe-stacks --stack-name TestDevEnv > /dev/null 2>&1 && echo true || echo false
-                    // ''', returnStdout: true).trim()
+                        // Check if the stack exists
+                        // def stackExists = sh(script: '''
+                        //     aws cloudformation describe-stacks --stack-name TestDevEnv > /dev/null 2>&1 && echo true || echo false
+                        // ''', returnStdout: true).trim()
 
-                    // if (stackExists == 'true') {    // delete stack if it exists
-                    //     sh '''
-                    //         aws cloudformation delete-stack --stack-name TestDevEnv
-                    //     '''
-                    //     // Wait for the stack to be deleted
-                    //     sh '''
-                    //         aws cloudformation wait stack-delete-complete \
-                    //             --stack-name TestDevEnv
-                    //     '''
-                    // }
+                        // if (stackExists == 'true') {    // delete stack if it exists
+                        //     sh '''
+                        //         aws cloudformation delete-stack --stack-name TestDevEnv
+                        //     '''
+                        //     // Wait for the stack to be deleted
+                        //     sh '''
+                        //         aws cloudformation wait stack-delete-complete \
+                        //             --stack-name TestDevEnv
+                        //     '''
+                        // }
 
-                    // Create the stack
+                        // Create the stack
+                            sh """
+                                aws cloudformation deploy \
+                                    --template-file dev-env.yml \
+                                    --stack-name ${DEV_STACK_NAME} \
+                                    --capabilities CAPABILITY_IAM \
+                                    --parameter-overrides \
+                                        KeyName=${env.KEY_NAME} \
+                                        VpcId=${env.VPC_ID_DEV} \
+                                        SubnetId=${env.SUBNET_ID_DEV} \
+                                        SshPubKey='${ssh_pub_key}' \
+                                        ElasticId=${env.ELASTIC_ID_DEV}
+                            """
+
+                        // Wait for the stack to be created
                         sh """
-                            aws cloudformation deploy \
-                                --template-file dev-env.yml \
-                                --stack-name ${DEV_STACK_NAME} \
-                                --capabilities CAPABILITY_IAM \
-                                --parameter-overrides \
-                                    KeyName=${env.KEY_NAME} \
-                                    VpcId=${env.VPC_ID_DEV} \
-                                    SubnetId=${env.SUBNET_ID_DEV} \
-                                    SshPubKey='${ssh_pub_key}' \
-                                    ElasticId=${env.ELASTIC_ID_DEV}
+                            aws cloudformation wait stack-create-complete \
+                                --stack-name ${DEV_STACK_NAME}
                         """
 
-                    // Wait for the stack to be created
-                    sh """
-                        aws cloudformation wait stack-create-complete \
-                            --stack-name ${DEV_STACK_NAME}
-                    """
-
-                    sleep(time: 10, unit: 'SECONDS')
+                        sleep(time: 10, unit: 'SECONDS')
+                    }
                 }
             }
         }
-    }
 
-    stage("Ping Remote Server") {
-        steps {
-            script {
-                sh """
-                    chmod +x ansible/playbooks/PullAndTest.yml
-                    ssh-keyscan ${ELASTIC_IP_DEV} >> /var/lib/jenkins/.ssh/known_hosts
-                """
-                ansiblePlaybook becomeUser: 'ansibleadmin',
-                                credentialsId: "${env.ANSIBLE_CREDENTIALS}", 
-                                installation: 'Ansible', 
-                                inventory: 'ansible/hosts', 
-                                playbook: "ansible/playbooks/PingAll.yml"
+        stage("Ping Remote Server") {
+            steps {
+                script {
+                    sh """
+                        chmod +x ansible/playbooks/PullAndTest.yml
+                        ssh-keyscan ${ELASTIC_IP_DEV} >> /var/lib/jenkins/.ssh/known_hosts
+                    """
+                    ansiblePlaybook becomeUser: 'ansibleadmin',
+                                    credentialsId: "${env.ANSIBLE_CREDENTIALS}", 
+                                    installation: 'Ansible', 
+                                    inventory: 'ansible/hosts', 
+                                    playbook: "ansible/playbooks/PingAll.yml"
+                }
             }
         }
-    }
 
         
-    stage("Deploy Dev Server") {
-        steps {
-            script {
-                // Run the Ansible playbook
-                ansiblePlaybook becomeUser: 'ansibleadmin', 
-                                credentialsId: "${env.ANSIBLE_CREDENTIALS}", 
-                                installation: 'Ansible', 
-                                inventory: 'ansible/hosts', 
-                                playbook: "ansible/playbooks/${PLAYBOOK_FILENAME}"
+        stage("Deploy Dev Server") {
+            steps {
+                script {
+                    // Run the Ansible playbook
+                    ansiblePlaybook becomeUser: 'ansibleadmin', 
+                                    credentialsId: "${env.ANSIBLE_CREDENTIALS}", 
+                                    installation: 'Ansible', 
+                                    inventory: 'ansible/hosts', 
+                                    playbook: "ansible/playbooks/${PLAYBOOK_FILENAME}"
 
-                // Read and check the exit code
-                // def exitCode = readFile('/tmp/jenkins/test_exit_code.txt').trim()
-                // if (exitCode != '0') {
-                //     // Display test output due to failure
-                //     sh 'cat /tmp/jenkins/test_output.txt || echo "No test output available."'
-                //     error "Tests failed with exit code: ${exitCode}"
-                // }
+                    // Read and check the exit code
+                    // def exitCode = readFile('/tmp/jenkins/test_exit_code.txt').trim()
+                    // if (exitCode != '0') {
+                    //     // Display test output due to failure
+                    //     sh 'cat /tmp/jenkins/test_output.txt || echo "No test output available."'
+                    //     error "Tests failed with exit code: ${exitCode}"
+                    // }
+                }
             }
         }
-    }
 
-    stage("Run Integration Test on Remote Server") {
-        steps {
-            script {
-                sh """
-                    npm install
-                    npx jest integration
-                """
+        stage("Run Integration Test on Remote Server") {
+            steps {
+                script {
+                    sh """
+                        npm install
+                        npx jest integration
+                    """
+                }
             }
         }
-    }
 
-    stage("Run Web UI Test on Remote Server") {
-        steps {
-            script {
-                sh """
-                    sudo dnf install -y xorg-x11-server-Xvfb gtk3-devel nss alsa-lib
-                    npx cypress run
-                """
+        stage("Run Web UI Test on Remote Server") {
+            steps {
+                script {
+                    sh """
+                        sudo dnf install -y xorg-x11-server-Xvfb gtk3-devel nss alsa-lib
+                        npx cypress run
+                    """
+                }
             }
         }
-    }
-    
+
+        stage('CloudFormation Deploy Production Stack') {
+            steps {
+                script {
+                    // temp delete stack
+                    // sh '''
+                    //     aws cloudformation delete-stack --stack-name ProdEnv
+                    // '''
+                    //         // Wait for the stack to be deleted
+                    // sh '''
+                    //     aws cloudformation wait stack-delete-complete \
+                    //         --stack-name ProdEnv
+                    // '''
+
+                    def SWARM_MASTER_TOKEN = sh(script: "docker swarm join-token worker -q", returnStdout: true).trim()
+
+                    def SWARM_MASTER_IP = sh(script: "hostname -I | awk '{print \$1}'", returnStdout: true).trim()
+
+                    echo "Swarm Master Token: ${SWARM_MASTER_TOKEN} | Swarm Master IP: ${SWARM_MASTER_IP}"
+
+                    // Deploy or update the CloudFormation stack
+                    sh """
+                        aws cloudformation deploy \
+                            --template-file cloudformation/prod-env.yml \
+                            --stack-name ${env.PROD_STACK_NAME} \
+                            --region ${env.AWS_REGION} \
+                            --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
+                            --parameter-overrides \
+                                KeyName=${env.KEY_NAME} \
+                                ImageIdFrontEnd=${env.IMAGE_ID_FRONTEND} \
+                                ImageIdBackEnd=${env.IMAGE_ID_BACKEND} \
+                                VpcCidr=${VPC_CIDR} \
+                                PublicSubnet1Cidr=${PUBLIC_SUBNET1_CIDR} \
+                                PublicSubnet2Cidr=${PUBLIC_SUBNET2_CIDR} \
+                                TrustedSSHCIDR=${env.TRUSTED_SSH_CIDR} \
+                                SwarmMasterToken=${SWARM_MASTER_TOKEN} \
+                                SwarmMasterIP=${SWARM_MASTER_IP} \
+                                HostnameFE=${env.HOSTNAME_FE} \
+                                HostnameBE=${env.HOSTNAME_BE}
+                    """
+
+                    // Wait for stack to be fully deployed
+                    sh """
+                        aws cloudformation wait stack-create-complete --stack-name ProdEnv
+                        aws cloudformation describe-stack-events --stack-name ProdEnv --max-items 20
+                    """
+
+                    // Retrieve stack outputs and set them as environment variables
+                    // def stackOutputs = sh (
+                    //     script: "aws cloudformation describe-stacks --stack-name ProdEnv --region ${env.AWS_REGION} --query 'Stacks[0].Outputs' --output json",
+                    //     returnStdout: true
+                    // ).trim()
+
+                    // def outputs = readJSON text: stackOutputs
+
+                    // // Extract specific outputs
+                    // def loadBalancerDNS = outputs.find { it.OutputKey == 'LoadBalancerDNS' }?.OutputValue
+                    // def frontEndASGName = outputs.find { it.OutputKey == 'FrontEndAutoScalingGroupName' }?.OutputValue
+                    // def backEndASGName = outputs.find { it.OutputKey == 'BackEndAutoScalingGroupName' }?.OutputValue
+
+                    // // Set environment variables for subsequent stages
+                    // env.LOAD_BALANCER_DNS = loadBalancerDNS
+                    // env.FRONT_END_ASG_NAME = frontEndASGName
+                    // env.BACK_END_ASG_NAME = backEndASGName
+
+                    // // (Optional) Echo the outputs
+                    // echo "Load Balancer DNS: ${env.LOAD_BALANCER_DNS}"
+                    // echo "Front-End ASG Name: ${env.FRONT_END_ASG_NAME}"
+                    // echo "Back-End ASG Name: ${env.BACK_END_ASG_NAME}"
+                }
+            }
+        }
+
+        /*
+        stage("Deploy to Swarm") {
+            steps {
+                script {
+                    // We assume Jenkins is the Swarm manager.
+                    // The env variables HOSTNAME_FE and HOSTNAME_BE contain the hostnames for the new nodes.
+
+                    def feHostname = env.HOSTNAME_FE
+                    def beHostname = env.HOSTNAME_BE
+
+                    // A small helper method to check if a node is known by the manager
+                    def nodeInSwarm = { nodeName ->
+                        def result = sh(script: "docker node ls --format '{{.Hostname}}' | grep -w '${nodeName}' || true", returnStdout: true).trim()
+                        return (result == nodeName)
+                    }
+
+                    // // ----- Wait for the front-end node -----
+                    echo "Waiting for node '${feHostname}' to join the swarm..."
+                    def tries = 5                  // Number of retries
+                    def found = false
+                    for (int i = 1; i <= tries; i++) {
+                        if (nodeInSwarm(feHostname)) {
+                            echo "Node '${feHostname}' is in the swarm."
+                            found = true
+                            break
+                        }
+                        echo "Node '${feHostname}' not found yet. Sleeping 10 seconds..."
+                        sleep 10
+                    }
+                    if (!found) {
+                        error("Front-end node '${feHostname}' never appeared in docker node ls after ${tries} retries.")
+                    }
+
+                    
+                    // // ----- Wait for the back-end node -----
+                    echo "Waiting for node '${beHostname}' to join the swarm..."
+                    found = false
+                    for (int i = 1; i <= tries; i++) {
+                        if (nodeInSwarm(beHostname)) {
+                            echo "Node '${beHostname}' is in the swarm."
+                            found = true
+                            break
+                        }
+                        echo "Node '${beHostname}' not found yet. Sleeping 10 seconds..."
+                        sleep 10
+                    }
+                    if (!found) {
+                        error("Back-end node '${beHostname}' never appeared in docker node ls after ${tries} retries.")
+                    }
+
+                    // Assign the label -> Need put condition for labeling
+                    sh "docker node update --label-add role=server ${beHostname}"
+                    sh "docker node update --label-add role=client ${feHostname}"
+
+                    // Now that both nodes are labeled, you can safely deploy
+                    sh "docker stack deploy -c docker-compose.yml ${env.STACK_NAME}"
+                }
+            }
+        }
+        */
 
     // post {
     //     failure {
