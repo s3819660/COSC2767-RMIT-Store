@@ -83,32 +83,32 @@ pipeline {
         // }
 
         // create Docker image -> push to Docker Hub -> pull back to build image
-        // stage("Build & Push Docker images") {
-        //     steps {
-        //         script {
-        //             parallel(
-        //                 "Client": {
-        //                     dir('client') {
-        //                         docker.withRegistry('', DOCKER_CREDENTIALS) {
-        //                         def clientImage = docker.build("${IMAGE_NAME}-client")
-        //                         clientImage.push("${IMAGE_TAG}")
-        //                         clientImage.push("latest")
-        //                         }
-        //                     }
-        //                 },
-        //                 "Server": {
-        //                     dir('server') {
-        //                         docker.withRegistry('', DOCKER_CREDENTIALS) {
-        //                         def serverImage = docker.build("${IMAGE_NAME}-server")
-        //                         serverImage.push("${IMAGE_TAG}")
-        //                         serverImage.push("latest")
-        //                         }
-        //                     }
-        //                 }
-        //             )
-        //         }
-        //     }
-        // }
+        stage("Build & Push Docker images") {
+            steps {
+                script {
+                    parallel(
+                        "Client": {
+                            dir('client') {
+                                docker.withRegistry('', DOCKER_CREDENTIALS) {
+                                def clientImage = docker.build("${IMAGE_NAME}-client")
+                                clientImage.push("${IMAGE_TAG}")
+                                clientImage.push("latest")
+                                }
+                            }
+                        },
+                        "Server": {
+                            dir('server') {
+                                docker.withRegistry('', DOCKER_CREDENTIALS) {
+                                def serverImage = docker.build("${IMAGE_NAME}-server")
+                                serverImage.push("${IMAGE_TAG}")
+                                serverImage.push("latest")
+                                }
+                            }
+                        }
+                    )
+                }
+            }
+        }
 
         stage("Pull Docker Image") { // New stage added to pull the latest image
             steps {
@@ -212,14 +212,14 @@ pipeline {
             steps {
                 script {
                     // temp delete stack
-                    sh '''
-                        aws cloudformation delete-stack --stack-name ProdEnv
-                    '''
-                            // Wait for the stack to be deleted
-                    sh '''
-                        aws cloudformation wait stack-delete-complete \
-                            --stack-name ProdEnv
-                    '''
+                    // sh '''
+                    //     aws cloudformation delete-stack --stack-name ProdEnv
+                    // '''
+                    //         // Wait for the stack to be deleted
+                    // sh '''
+                    //     aws cloudformation wait stack-delete-complete \
+                    //         --stack-name ProdEnv
+                    // '''
 
                     def SWARM_MASTER_TOKEN = sh(script: "docker swarm join-token worker -q", returnStdout: true).trim()
 
