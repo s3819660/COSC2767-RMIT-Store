@@ -22,7 +22,7 @@ app.use('/api/auth', authRoutes);
 
 describe('Auth Routes', () => {
   beforeAll(async () => {
-    const url = `mongodb://34.226.129.202:27017/rmit_ecommerce`; // fix this to link to .env file
+    const url = `mongodb+srv://admin:admin@cluster0.7agmu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`; // fix this to link to .env file
     await mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
   });
 
@@ -65,7 +65,7 @@ describe('Auth Routes', () => {
     });
     await newUser.save();
 
-    const response = await request('http://54.156.23.27:3000')
+    const response = await request('http://23.20.223.181:3000')
       .post('/api/auth/login')
       .set('Content-Type', 'application/json')
       .send({ email: 'test@example.com', password: 'password123' });
