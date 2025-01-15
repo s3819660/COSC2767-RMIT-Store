@@ -220,8 +220,6 @@ pipeline {
                 //     sh 'cat /tmp/jenkins/test_output.txt || echo "No test output available."'
                 //     error "Tests failed with exit code: ${exitCode}"
                 // }
-
-                echo "Tests passed successfully."
             }
         }
     }
