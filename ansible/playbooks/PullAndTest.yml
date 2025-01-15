@@ -1,5 +1,5 @@
 ---
-- hosts: TestDevServer
+- hosts: DevServer
 
   tasks:
     - name: Kill all
