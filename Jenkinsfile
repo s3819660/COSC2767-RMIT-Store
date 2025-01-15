@@ -166,7 +166,7 @@ pipeline {
                                     VpcId=${env.VPC_ID_DEV} \
                                     SubnetId=${env.SUBNET_ID_DEV} \
                                     SshPubKey='${ssh_pub_key}' \
-                                    ElasticIpId=${env.ELASTIC_ID_DEV}
+                                    ElasticId=${env.ELASTIC_ID_DEV}
                         """
 
                     // Wait for the stack to be created
