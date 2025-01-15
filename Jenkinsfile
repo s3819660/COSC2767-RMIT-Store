@@ -19,6 +19,8 @@ pipeline {
 
         SERVICE_NAME = "${APP_NAME}-service"
 
+        PLAYBOOK_FILENAME = "PullAndTest.yml"
+
         AWS_REGION = "us-east-1"
         SNS_TOPIC_ARN = "arn:aws:sns:us-east-1:975050071897:test-topic"
 
