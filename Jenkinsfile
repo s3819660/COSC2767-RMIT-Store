@@ -183,7 +183,7 @@ pipeline {
         }
     }
 
-    /*stage("Ping Remote Server") {
+    stage("Ping Remote Server") {
         steps {
             script {
                 ansiblePlaybook becomeUser: 'ansibleadmin', 
@@ -193,7 +193,7 @@ pipeline {
                                 playbook: "ansible/playbooks/PingAll.yml"
             }
         }
-    }*/
+    }
 
         
     stage("Deploy Dev Server") {
