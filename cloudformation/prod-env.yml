@@ -1,10 +1,7 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: " production environment with custom VPC, front-end and back-end EC2 instances in Auto Scaling Groups (no ALB)."
+Description: "Production environment (fully wide-open security groups) with custom VPC, ALB, Front-End and Back-End EC2 instances with Auto Scaling"
 
 Parameters:
-  # --------------------------------------------------
-  # Key pair & AMI IDs
-  # --------------------------------------------------
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: "Name of an existing EC2 KeyPair for SSH access."
@@ -17,9 +14,6 @@ Parameters:
     Type: AWS::EC2::Image::Id
     Description: "The AMI ID for the Back-End EC2 instance."
 
-  # --------------------------------------------------
-  # Networking
-  # --------------------------------------------------
   VpcCidr:
     Type: String
     Default: 10.0.0.0/16
@@ -28,24 +22,18 @@ Parameters:
   PublicSubnet1Cidr:
     Type: String
     Default: 10.0.1.0/24
-    Description: "CIDR block for Public Subnet A"
+    Description: "CIDR block for Public Subnet 1"
 
   PublicSubnet2Cidr:
     Type: String
     Default: 10.0.2.0/24
-    Description: "CIDR block for Public Subnet B"
+    Description: "CIDR block for Public Subnet 2"
 
-  # --------------------------------------------------
-  # Security / Access
-  # --------------------------------------------------
   TrustedSSHCIDR:
     Type: String
     Default: 0.0.0.0/0
-    Description: "CIDR block for SSH access to EC2 instances"
+    Description: "CIDR block for SSH access to EC2 instances (unused below, since we go wide-open)."
 
-  # --------------------------------------------------
-  # Docker Swarm Master Info
-  # --------------------------------------------------
   SwarmMasterToken:
     Type: String
     Description: "Docker Swarm join token for worker nodes"
@@ -54,9 +42,6 @@ Parameters:
     Type: String
     Description: "Private IP address of the Docker Swarm master node"
 
-  # --------------------------------------------------
-  # Hostnames for Instances
-  # --------------------------------------------------
   HostnameFE:
     Type: String
     Default: "FrontEnd"
@@ -68,10 +53,12 @@ Parameters:
     Description: "Hostname for Back-End EC2 instances"
 
 Resources:
-  # ==================================================
-  # 1) VPC & Networking
-  # ==================================================
-  MainVPC:
+
+  ########################
+  # 1) VPC + Networking  #
+  ########################
+
+  ProdVPC:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: !Ref VpcCidr
@@ -79,25 +66,25 @@ Resources:
       EnableDnsHostnames: true
       Tags:
         - Key: Name
-          Value: MainVPC
+          Value: ProdVPC
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
       Tags:
         - Key: Name
-          Value: MainInternetGateway
+          Value: ProdInternetGateway
 
   VPCGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
-      VpcId: !Ref MainVPC
+      VpcId: !Ref ProdVPC
       InternetGatewayId: !Ref InternetGateway
 
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref MainVPC
+      VpcId: !Ref ProdVPC
       Tags:
         - Key: Name
           Value: PublicRouteTable
@@ -110,48 +97,52 @@ Resources:
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref InternetGateway
 
-  PublicSubnetA:
+  # Subnet 1
+  PublicSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref MainVPC
+      VpcId: !Ref ProdVPC
       CidrBlock: !Ref PublicSubnet1Cidr
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select [0, !GetAZs ""]
       Tags:
         - Key: Name
-          Value: PublicSubnetA
+          Value: PublicSubnet1
 
-  PublicSubnetARouteTableAssociation:
+  PublicSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref PublicSubnetA
+      SubnetId: !Ref PublicSubnet1
       RouteTableId: !Ref PublicRouteTable
 
-  PublicSubnetB:
+  # Subnet 2
+  PublicSubnet2:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref MainVPC
+      VpcId: !Ref ProdVPC
       CidrBlock: !Ref PublicSubnet2Cidr
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select [1, !GetAZs ""]
       Tags:
         - Key: Name
-          Value: PublicSubnetB
+          Value: PublicSubnet2
 
-  PublicSubnetBRouteTableAssociation:
+  PublicSubnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref PublicSubnetB
+      SubnetId: !Ref PublicSubnet2
       RouteTableId: !Ref PublicRouteTable
 
-  # ==================================================
-  # 2) Security Groups
-  # ==================================================
-  FrontEndSG:
+  ################################
+  # 2) Security Groups (All Open) #
+  ################################
+
+  # ALB Security Group - wide open
+  ALBSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: "Wide open SG for Front-End"
-      VpcId: !Ref MainVPC
+      GroupDescription: "Wide-open SG for ALB"
+      VpcId: !Ref ProdVPC
       SecurityGroupIngress:
         - IpProtocol: -1
           CidrIp: 0.0.0.0/0
@@ -160,13 +151,14 @@ Resources:
           CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
-          Value: "FrontEndSG"
+          Value: ALBSG
 
-  BackEndSG:
+  # Front-End EC2 Security Group - wide open
+  FrontEndSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: "Wide open SG for Back-End"
-      VpcId: !Ref MainVPC
+      GroupDescription: "Wide-open SG for Front-End EC2 Instance"
+      VpcId: !Ref ProdVPC
       SecurityGroupIngress:
         - IpProtocol: -1
           CidrIp: 0.0.0.0/0
@@ -175,11 +167,101 @@ Resources:
           CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
-          Value: "BackEndSG"
+          Value: FrontEndSG
 
-  # ==================================================
-  # 3) Launch Templates
-  # ==================================================
+  # Back-End EC2 Security Group - wide open
+  BackEndSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Wide-open SG for Back-End EC2 Instance"
+      VpcId: !Ref ProdVPC
+      SecurityGroupIngress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: BackEndSG
+
+  #####################################
+  # 3) Load Balancer + Target Group   #
+  #####################################
+
+  AppLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: "ProdALB"
+      Subnets:
+        - !Ref PublicSubnet1
+        - !Ref PublicSubnet2
+      SecurityGroups:
+        - !GetAtt ALBSecurityGroup.GroupId
+      Scheme: internet-facing
+      Type: application
+      IpAddressType: ipv4
+
+  AppTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: "ProdTG"
+      Port: 8080
+      Protocol: HTTP
+      VpcId: !Ref ProdVPC
+      TargetType: instance
+      HealthCheckProtocol: HTTP
+      HealthCheckPort: "8080"
+      HealthCheckPath: /
+      Matcher:
+        HttpCode: "200"
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 10
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 5
+
+  AppTargetGroupBackEnd:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: "ProdTGBackEnd"
+      Port: 3000
+      Protocol: HTTP
+      VpcId: !Ref ProdVPC
+      TargetType: instance
+      HealthCheckProtocol: HTTP
+      HealthCheckPort: "3000"
+      HealthCheckPath: /
+      Matcher:
+        HttpCode: "200"
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 10
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 5
+
+  ALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref AppLoadBalancer
+      Protocol: HTTP
+      Port: 8080
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref AppTargetGroup
+
+  ALBListenerBackEnd:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref AppLoadBalancer
+      Protocol: HTTP
+      Port: 3000
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref AppTargetGroupBackEnd
+
+  #####################################
+  # 4) Launch Templates               #
+  #####################################
+
   FrontEndLaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
     Properties:
@@ -189,24 +271,19 @@ Resources:
         ImageId: !Ref ImageIdFrontEnd
         KeyName: !Ref KeyName
         SecurityGroupIds:
-          - !Ref FrontEndSG
+          - !Ref FrontEndSecurityGroup
         UserData:
           Fn::Base64: !Sub |
             #!/bin/bash
             set -e
             HOSTNAME=${HostnameFE}
             hostnamectl set-hostname "$HOSTNAME"
-
             yum update -y
             yum install -y docker
+            service docker start
             systemctl enable docker
-            systemctl start docker
-
-            # Force leave swarm, reboot, then join again
-            sudo docker swarm leave --force
-            sudo reboot
-            sleep 45
-            sudo docker swarm join --token ${SwarmMasterToken} ${SwarmMasterIP}:2377
+            sudo sleep 10
+            sudo docker swarm join --token ${SwarmMasterToken} ${SwarmMasterIP}:2377  
 
   BackEndLaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
@@ -217,42 +294,25 @@ Resources:
         ImageId: !Ref ImageIdBackEnd
         KeyName: !Ref KeyName
         SecurityGroupIds:
-          - !Ref BackEndSG
+          - !Ref BackEndSecurityGroup
         UserData:
           Fn::Base64: !Sub |
             #!/bin/bash
             set -e
             HOSTNAME=${HostnameBE}
             hostnamectl set-hostname "$HOSTNAME"
-
             yum update -y
             yum install -y docker
+            service docker start
             systemctl enable docker
-            systemctl start docker
-
-            # Example: also install Mongo
-            # (If you don't need it, remove these lines)
-            sudo tee /etc/yum.repos.d/mongodb-org-6.0.repo <<EOF
-            [mongodb-org-6.0]
-            name=MongoDB Repository
-            baseurl=https://repo.mongodb.org/yum/amazon/2023/mongodb-org/6.0/x86_64/
-            gpgcheck=1
-            enabled=1
-            gpgkey=https://www.mongodb.org/static/pgp/server-6.0.asc
-            EOF
-            yum install -y mongodb-org
-            yum install -y mongodb-mongosh-shared-openssl3
-
-            # Force leave swarm, reboot, then join again
-            sudo docker swarm leave --force
-            sudo reboot
-            sleep 45
+            sudo sleep 10
             sudo docker swarm join --token ${SwarmMasterToken} ${SwarmMasterIP}:2377
 
-  # ==================================================
-  # 4) Auto Scaling Groups (no ALB references)
-  # ==================================================
-  FrontEndASG:
+  #####################################
+  # 5) Auto Scaling Groups            #
+  #####################################
+
+  FrontEndAutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
       AutoScalingGroupName: "FrontEndASG"
@@ -263,14 +323,16 @@ Resources:
       DesiredCapacity: "1"
       MaxSize: "3"
       VPCZoneIdentifier:
-        - !Ref PublicSubnetA
-        - !Ref PublicSubnetB
+        - !Ref PublicSubnet1
+        - !Ref PublicSubnet2
+      TargetGroupARNs:
+        - !Ref AppTargetGroup
       Tags:
         - Key: Name
           Value: FrontEndASG
           PropagateAtLaunch: true
 
-  BackEndASG:
+  BackEndAutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
       AutoScalingGroupName: "BackEndASG"
@@ -281,21 +343,24 @@ Resources:
       DesiredCapacity: "1"
       MaxSize: "3"
       VPCZoneIdentifier:
-        - !Ref PublicSubnetA
-        - !Ref PublicSubnetB
+        - !Ref PublicSubnet1
+        - !Ref PublicSubnet2
+      TargetGroupARNs:
+        - !Ref AppTargetGroupBackEnd
       Tags:
         - Key: Name
           Value: BackEndASG
           PropagateAtLaunch: true
 
-  # ==================================================
-  # 5) Scaling Policies (CPU-based)
-  # ==================================================
+  #####################################
+  # 6) Scaling Policies               #
+  #####################################
+
   FrontEndScaleOutPolicy:
     Type: AWS::AutoScaling::ScalingPolicy
     Properties:
       PolicyName: "FrontEndScaleOut"
-      AutoScalingGroupName: !Ref FrontEndASG
+      AutoScalingGroupName: !Ref FrontEndAutoScalingGroup
       PolicyType: "TargetTrackingScaling"
       TargetTrackingConfiguration:
         PredefinedMetricSpecification:
@@ -306,7 +371,7 @@ Resources:
     Type: AWS::AutoScaling::ScalingPolicy
     Properties:
       PolicyName: "FrontEndScaleIn"
-      AutoScalingGroupName: !Ref FrontEndASG
+      AutoScalingGroupName: !Ref FrontEndAutoScalingGroup
       PolicyType: "TargetTrackingScaling"
       TargetTrackingConfiguration:
         PredefinedMetricSpecification:
@@ -317,7 +382,7 @@ Resources:
     Type: AWS::AutoScaling::ScalingPolicy
     Properties:
       PolicyName: "BackEndScaleOut"
-      AutoScalingGroupName: !Ref BackEndASG
+      AutoScalingGroupName: !Ref BackEndAutoScalingGroup
       PolicyType: "TargetTrackingScaling"
       TargetTrackingConfiguration:
         PredefinedMetricSpecification:
@@ -328,7 +393,7 @@ Resources:
     Type: AWS::AutoScaling::ScalingPolicy
     Properties:
       PolicyName: "BackEndScaleIn"
-      AutoScalingGroupName: !Ref BackEndASG
+      AutoScalingGroupName: !Ref BackEndAutoScalingGroup
       PolicyType: "TargetTrackingScaling"
       TargetTrackingConfiguration:
         PredefinedMetricSpecification:
@@ -336,25 +401,26 @@ Resources:
         TargetValue: 30.0
 
 Outputs:
-  # ==================================================
-  # 6) Outputs
-  # ==================================================
   VPCId:
     Description: "The ID of the new VPC"
-    Value: !Ref MainVPC
+    Value: !Ref ProdVPC
 
-  PublicSubnetAId:
-    Description: "ID of Public Subnet A"
-    Value: !Ref PublicSubnetA
+  PublicSubnet1Id:
+    Description: "First public subnet"
+    Value: !Ref PublicSubnet1
 
-  PublicSubnetBId:
-    Description: "ID of Public Subnet B"
-    Value: !Ref PublicSubnetB
+  PublicSubnet2Id:
+    Description: "Second public subnet"
+    Value: !Ref PublicSubnet2
+
+  LoadBalancerDNS:
+    Description: "DNS name of the ALB"
+    Value: !GetAtt AppLoadBalancer.DNSName
 
   FrontEndAutoScalingGroupName:
     Description: "Auto Scaling Group name for Front-End EC2 instances"
-    Value: !Ref FrontEndASG
+    Value: !Ref FrontEndAutoScalingGroup
 
   BackEndAutoScalingGroupName:
     Description: "Auto Scaling Group name for Back-End EC2 instances"
-    Value: !Ref BackEndASG
+    Value: !Ref BackEndAutoScalingGroup
