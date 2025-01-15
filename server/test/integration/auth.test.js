@@ -35,9 +35,14 @@ describe('Auth Routes', () => {
   // });
 
   it('should register a new user', async () => {
+    const generateRandomEmail = () => {
+      const timestamp = Date.now(); // Use current timestamp for uniqueness
+      return `user${timestamp}@example.com`;
+    };
+
     const requestBody = {
       "isSubscribed": false,
-      "email": "aaaaaa@integrate.com",
+      "email": generateRandomEmail(),
       "firstName": "John",
       "lastName": "Doe",
       "password": "123456",
@@ -56,13 +61,8 @@ describe('Auth Routes', () => {
   });
 
   it('should login an existing user', async () => {
-    const generateRandomEmail = () => {
-      const timestamp = Date.now(); // Use current timestamp for uniqueness
-      return `user${timestamp}@example.com`;
-    };
-
     const newUser = new User({
-      email: generateRandomEmail(),
+      email: 'test@example.com',
       firstName: 'John',
       lastName: 'Doe',
       password: 'password123',
