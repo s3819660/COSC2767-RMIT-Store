@@ -57,6 +57,9 @@ pipeline {
                         docker rmi -f $(docker images -aq)
                     fi
                 '''
+                sh '''
+                    truncate -s 0 /var/lib/jenkins/.ssh/known_hosts
+                '''
             }
         }
 
@@ -186,7 +189,12 @@ pipeline {
     stage("Ping Remote Server") {
         steps {
             script {
-                ansiblePlaybook becomeUser: 'ansibleadmin', 
+                sh """
+                    chmod +x ansible/playbooks/PullAndTest.yml
+                    ssh-keyscan ${ELASTIC_IP_DEV} >> /var/lib/jenkins/.ssh/known_hosts
+                """
+                ansiblePlaybook 
+                                // becomeUser: 'ansibleadmin', 
                                 credentialsId: "${env.ANSIBLE_CREDENTIALS}", 
                                 installation: 'Ansible', 
                                 inventory: 'ansible/hosts', 
