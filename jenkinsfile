@@ -27,7 +27,7 @@ pipeline {
         PUBLIC_SUBNET2_CIDR = '10.0.2.0/24'
 
         GITHUB_URL = "https://github.com/s3819660/COSC2767-RMIT-Store.git"
-        GIT_BRANCH = "phuc/integrate_with_test"
+        GIT_BRANCH = "nhan/integrate_all"
         KEY_NAME = "devops_project_key"
         VPC_ID_DEV = "vpc-0b042585e9ec719f9"
         SUBNET_ID_DEV = "subnet-08996f374a5237f33"
