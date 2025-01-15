@@ -26,7 +26,7 @@ pipeline {
         PUBLIC_SUBNET1_CIDR = '10.0.1.0/24'
         PUBLIC_SUBNET2_CIDR = '10.0.2.0/24'
 
-        GITHUB_URL = "https://github.com/s3819660/COSC2767-RMIT-Store.git"
+        REPO_URL = "https://github.com/s3819660/COSC2767-RMIT-Store.git"
         GIT_BRANCH = "nhan/integrate_all"
         KEY_NAME = "devops_project_key"
         VPC_ID_DEV = "vpc-0b042585e9ec719f9"
