@@ -56,8 +56,13 @@ describe('Auth Routes', () => {
   });
 
   it('should login an existing user', async () => {
+    const generateRandomEmail = () => {
+      const timestamp = Date.now(); // Use current timestamp for uniqueness
+      return `user${timestamp}@example.com`;
+    };
+
     const newUser = new User({
-      email: 'test@example.com',
+      email: generateRandomEmail(),
       firstName: 'John',
       lastName: 'Doe',
       password: 'password123',
