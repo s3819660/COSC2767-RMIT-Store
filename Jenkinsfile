@@ -193,9 +193,7 @@ pipeline {
                     chmod +x ansible/playbooks/PullAndTest.yml
                     ssh-keyscan ${ELASTIC_IP_DEV} >> /var/lib/jenkins/.ssh/known_hosts
                 """
-                ansiblePlaybook 
-                                // becomeUser: 'ansibleadmin', 
-                                credentialsId: "${env.ANSIBLE_CREDENTIALS}", 
+                ansiblePlaybook credentialsId: "${env.ANSIBLE_CREDENTIALS}", 
                                 installation: 'Ansible', 
                                 inventory: 'ansible/hosts', 
                                 playbook: "ansible/playbooks/PingAll.yml"
